@@ -1,10 +1,11 @@
 import pygame as pg
 
+
 class Screen:
     def __init__(self, game):
         self.game = game
 
-        self.background = pg.image.load('src/assets/background.png')
+        self.background = pg.image.load("src/assets/background.png")
 
     def handle_events(self, events):
         pass
@@ -24,7 +25,9 @@ class MenuScreen(Screen):
 
     def draw(self, surface):
         super().draw(surface)
-        text = self.game.font.render("Appuie sur Entrée pour jouer", True, (255,255,255))
+        text = self.game.font.render(
+            "Appuie sur Entrée pour jouer", True, (255, 255, 255)
+        )
         surface.blit(text, (100, 100))
 
 
