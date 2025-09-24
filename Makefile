@@ -1,4 +1,7 @@
-.PHONY: run
+.PHONY: run requirements
 
 run:
-	clear && python3 main.py
+	clear && python3 ./src/main.py
+
+requirements:
+	pip install -r requirements.txt

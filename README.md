@@ -1,4 +1,4 @@
-### Projets des étudiants en BUT Info 2025-2026
+### Projets des étudiants Julian Cazin, Clément Duberseuil, Corentin Dupuy et Arthur Jacquot en BUT Info 2025-2026
 
 # Projet de Développement de Jeux 
 ## Langage de programmation au choix
