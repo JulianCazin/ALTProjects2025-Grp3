@@ -1,6 +1,8 @@
 import sys
 import logging
+import os
 
+from classes.game import Game
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,9 +16,14 @@ def main():
     """Fonction principale de l'application."""
     logger.info("Démarrage du programme...")
     
-    print("Hello, world !")
+    Game().run()
+    logger.info("Game started.")
+
     
     logger.info("Fin du programme.")
+
+
+
 
 if __name__ == "__main__":
     try:
