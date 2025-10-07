@@ -8,63 +8,63 @@ class Button:
         y,
         width,
         height,
-        buttonText="Button",
-        onclickFunction=None,
-        onePress=False,
+        button_text="Button",
+        on_click_function=None,
+        one_press=False,
         border_radius=0,
     ):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.onclickFunction = onclickFunction
-        self.onePress = onePress
-        self.alreadyPressed = False
+        self.on_click_function = on_click_function
+        self.one_press = one_press
+        self.already_pressed = False
         self.font = pg.font.SysFont(None, 30)
         self.border_radius = border_radius
 
-        self.fillColors = {
+        self.fill_colors = { 
             "normal": "#ffffff",
             "hover": "#666666",
             "pressed": "#333333",
         }
 
-        self.buttonSurface = pg.Surface((self.width, self.height), pg.SRCALPHA)
-        self.buttonRect = pg.Rect(self.x, self.y, self.width, self.height)
+        self.button_surface = pg.Surface((self.width, self.height), pg.SRCALPHA)
+        self.button_rect = pg.Rect(self.x, self.y, self.width, self.height)
 
-        self.buttonSurf = self.font.render(buttonText, True, (20, 20, 20))
+        self.button_surf = self.font.render(button_text, True, (20, 20, 20))
 
     def process(self):
-        mousePos = pg.mouse.get_pos()
+        mouse_pos = pg.mouse.get_pos()
         # Dessiner le rectangle avec coins arrondis
-        color = self.fillColors["normal"]
+        color = self.fill_colors["normal"]
 
-        if self.buttonRect.collidepoint(mousePos):
-            color = self.fillColors["hover"]
+        if self.button_rect.collidepoint(mouse_pos):
+            color = self.fill_colors["hover"]
             if pg.mouse.get_pressed(num_buttons=3)[0]:
-                color = self.fillColors["pressed"]
-                if self.onePress:
-                    self.onclickFunction()
-                elif not self.alreadyPressed:
-                    self.onclickFunction()
-                    self.alreadyPressed = True
+                color = self.fill_colors["pressed"]
+                if self.one_press:
+                    self.on_click_function()
+                elif not self.already_pressed:
+                    self.on_click_function()
+                    self.already_pressed = True
             else:
-                self.alreadyPressed = False
+                self.already_pressed = False
 
         # On efface et on dessine le rectangle
-        self.buttonSurface.fill((0, 0, 0, 0))  # transparent
+        self.button_surface.fill((0, 0, 0, 0))  # transparent
         pg.draw.rect(
-            self.buttonSurface,
+            self.button_surface,
             color,
             (0, 0, self.width, self.height),
             border_radius=self.border_radius,
         )
 
         # On centre le texte
-        self.buttonSurface.blit(
-            self.buttonSurf,
+        self.button_surface.blit(
+            self.button_surf,
             [
-                self.width / 2 - self.buttonSurf.get_rect().width / 2,
-                self.height / 2 - self.buttonSurf.get_rect().height / 2,
+                self.width / 2 - self.button_surf.get_rect().width / 2,
+                self.height / 2 - self.button_surf.get_rect().height / 2,
             ],
         )
