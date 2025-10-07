@@ -7,10 +7,10 @@ class Button:
         y,
         width,
         height,
-        buttonText="Button",
+        button_text="Button",
         text_color=(0, 0, 0, 255),
-        onclickFunction=None,
-        onePress=False,
+        on_click_function=None,
+        one_press=False,
         color=(255, 255, 255, 255),
         hover_color=(102, 102, 102, 255),
         pressed_color=(51, 51, 51, 255),
@@ -22,9 +22,9 @@ class Button:
         self.y = y
         self.width = width
         self.height = height
-        self.onclickFunction = onclickFunction
-        self.onePress = onePress
-        self.alreadyPressed = False
+        self.on_click_function = on_click_function
+        self.one_press = one_press
+        self.already_pressed = False
         self.font = pg.font.SysFont(None, 30)
         self.text_color=text_color
         self.color = color
@@ -34,10 +34,9 @@ class Button:
         self.border_color = border_color
         self.border_width = border_width
 
-        self.buttonSurface = pg.Surface((self.width, self.height), pg.SRCALPHA)
-        self.buttonRect = pg.Rect(self.x, self.y, self.width, self.height)
-
-        self.buttonSurf = self.font.render(buttonText, True, self.text_color)
+        self.button_surface = pg.Surface((self.width, self.height), pg.SRCALPHA)
+        self.button_rect = pg.Rect(self.x, self.y, self.width, self.height)
+        self.button_surf = self.font.render(buttonText, True, self.text_color)
 
     def process(self):
         mousePos = pg.mouse.get_pos()
@@ -47,25 +46,22 @@ class Button:
             color = self.hover_color
             if pg.mouse.get_pressed(num_buttons=3)[0]:
                 color = self.pressed_color
-                if self.onePress:
-                    self.onclickFunction()
-                elif not self.alreadyPressed:
-                    self.onclickFunction()
-                    self.alreadyPressed = True
+                if self.one_press:
+                    self.on_click_function()
+                elif not self.already_pressed:
+                    self.on_click_function()
+                    self.already_pressed = True
             else:
-                self.alreadyPressed = False
+                self.already_pressed = False
 
-        # Efface le contenu précédent (transparent)
-        self.buttonSurface.fill((0, 0, 0, 0))
-
-        # Dessine le fond
+        # On efface et on dessine le rectangle
+        self.button_surface.fill((0, 0, 0, 0))  # transparent
         pg.draw.rect(
-            self.buttonSurface,
+            self.button_surface,
             color,
             (0, 0, self.width, self.height),
             border_radius=self.border_radius,
         )
-
         # Dessine la bordure (si demandée)
         if self.border_width > 0:
             pg.draw.rect(
@@ -77,11 +73,11 @@ class Button:
             )
 
         # Centre le texte
-        self.buttonSurface.blit(
-            self.buttonSurf,
+        self.button_surface.blit(
+            self.button_surf,
             [
-                self.width / 2 - self.buttonSurf.get_rect().width / 2,
-                self.height / 2 - self.buttonSurf.get_rect().height / 2,
+                self.width / 2 - self.button_surf.get_rect().width / 2,
+                self.height / 2 - self.button_surf.get_rect().height / 2,
             ],
         )
 
