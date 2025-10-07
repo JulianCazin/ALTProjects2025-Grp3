@@ -5,6 +5,7 @@ import pygame as pg
 class Screen:
     def __init__(self, game):
         self.game = game
+
         self.background = pg.image.load("src/assets/background.png")
         self.title_font = pg.font.Font("src/assets/font/space_zinzins.ttf", 96)
         self.font = pg.font.Font("src/assets/font/space_zinzins.ttf", 32)
