@@ -5,6 +5,7 @@ import pygame as pg
 class Screen:
     def __init__(self, game):
         self.game = game
+
         self.background = pg.image.load("src/assets/background.png")
         self.title_font = pg.font.Font("src/assets/font/space_zinzins.ttf", 96)
         self.font = pg.font.Font("src/assets/font/space_zinzins.ttf", 32)
@@ -29,24 +30,28 @@ class MenuScreen(Screen):
         button_height = 60
 
         x_center = self.width // 2 - button_width // 2
-        y_center = self.width // 2 - button_width // 2
+        y_center = self.height // 2 - button_height // 2
 
         self.start_button = Button(
             x=x_center,
-            y=self.height // 6 + self.height // 6,
+            y=y_center - 40,
             width=button_width,
             height=button_height,
             border_radius=16,
-            buttonText="Jouer",
+            buttonText="PLAY",
             onclickFunction=self.start_game,
         )
         self.quit_button = Button(
             x=x_center,
-            y=self.height // 6 + self.height // 6 + 120,
+            y=y_center + 40,
             width=button_width,
             height=button_height,
             border_radius=16,
-            buttonText="Quitter",
+            buttonText="QUIT",
+            text_color=(255, 255, 255),
+            color=(255, 255, 255, 0),
+            border_color=(255, 255, 255),
+            border_width=6,
             onclickFunction=self.game.quit,
         )
 
