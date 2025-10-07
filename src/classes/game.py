@@ -17,7 +17,6 @@ class Game:
         self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 
         self.all_sprites = pg.sprite.Group()
-        self.font = pg.font.SysFont(None, 22)
 
         self.current_screen = MenuScreen(self)
 
@@ -33,8 +32,6 @@ class Game:
 
             for event in events:
                 if event.type == pg.QUIT:
-                    self.running = False
-                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     self.running = False
 
             self.current_screen.handle_events(events)
