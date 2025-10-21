@@ -7,7 +7,7 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         # Charger l’image de l’alien
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (40, 30))
+        self.image = pygame.transform.scale(self.image, (70, 70))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

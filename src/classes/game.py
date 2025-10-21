@@ -14,13 +14,9 @@ class Game:
 
         self.clock = pg.time.Clock()
         self.running = True
-        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
-
-        self.all_sprites = pg.sprite.Group()
+        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)  # fenetre fixe
 
         self.current_screen = MenuScreen(self)
-
-        pg.display.flip()
 
     def set_screen(self, screen):
         self.current_screen = screen
@@ -29,7 +25,6 @@ class Game:
         while self.running:
             dt = self.clock.tick(FPS) / 1000.0
             events = pg.event.get()
-
             for event in events:
                 if event.type == pg.QUIT:
                     self.running = False
@@ -40,6 +35,14 @@ class Game:
 
             pg.display.flip()
 
+        self.quit()
+
     def quit(self):
         pg.quit()
-        sys.exit(0)
+        sys.exit()
+
+        self.all_sprites = pg.sprite.Group()
+
+        self.current_screen = MenuScreen(self)
+
+        pg.display.flip()

@@ -1,5 +1,20 @@
+import random
 from classes.button import Button
 import pygame as pg
+
+from classes.player import Player
+from classes.bullet import Bullet
+from classes.enemy import Enemy
+
+
+PLAYER_IMG = "src/assets/alien_1.png"
+ENEMY_IMG = [
+    "src/assets/alien_1.png",
+    "src/assets/alien_2.png",
+    "src/assets/alien_3.png",
+    "src/assets/alien_4.png",
+]
+BULLET_IMG = "src/assets/alien_1.png"
 
 
 class Screen:
@@ -38,8 +53,8 @@ class MenuScreen(Screen):
             width=button_width,
             height=button_height,
             border_radius=16,
-            buttonText="PLAY",
-            onclickFunction=self.start_game,
+            button_text="PLAY",
+            on_click_function=self.start_game,
         )
         self.quit_button = Button(
             x=x_center,
@@ -47,12 +62,12 @@ class MenuScreen(Screen):
             width=button_width,
             height=button_height,
             border_radius=16,
-            buttonText="QUIT",
+            button_text="QUIT",
             text_color=(255, 255, 255),
             color=(255, 255, 255, 0),
             border_color=(255, 255, 255),
             border_width=6,
-            onclickFunction=self.game.quit,
+            on_click_function=self.game.quit,
         )
 
         self.buttons = [self.start_button, self.quit_button]
@@ -74,19 +89,91 @@ class MenuScreen(Screen):
         surface.blit(title, title_rect)
 
         for button in self.buttons:
-            surface.blit(button.buttonSurface, (button.x, button.y))
+            surface.blit(button.button_surface, (button.x, button.y))
 
 
 class GameScreen(Screen):
     def __init__(self, game):
+
         super().__init__(game)
+
         self.all_sprites = pg.sprite.Group()
+        self.bullets = pg.sprite.Group()
+        self.enemies = pg.sprite.Group()
+
+        # Joueur
+        self.player = Player(
+            x=self.width // 2,
+            y=self.height - 50,
+            speed=5,
+            image_path=PLAYER_IMG,
+        )
+        self.all_sprites.add(self.player)
+
+        self.generate_ennemies()
+
+        self.font_score = pg.font.Font("src/assets/font/space_zinzins.ttf", 36)
+        self.font_lives = pg.font.Font("src/assets/font/space_zinzins.ttf", 36)
+
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    self.player.shoot_basic(self.bullets, Bullet, BULLET_IMG)
+                if event.key == pg.K_LALT:
+                    self.player.shoot_spread(self.bullets, Bullet, BULLET_IMG)
+
+    def generate_ennemies(self):
+        # Ennemis
+        for row in range(4):
+            enemy_img = random.choice(ENEMY_IMG)
+            for col in range(8):
+                enemy = Enemy(
+                    x=80 + col * 80, y=50 + row * 60, image_path=enemy_img, speed=3
+                )
+                self.enemies.add(enemy)
+                self.all_sprites.add(enemy)
+
+        self.enemy_direction = 1
 
     def update(self, dt):
-        self.all_sprites.update(dt)
+        self.player.update(self.width)
+        self.bullets.update()
+
+        # Mise à jour ennemis
+        edge_reached = False
+        for enemy in self.enemies:
+            if enemy.update(self.width):
+                edge_reached = True
+        if edge_reached:
+            for enemy in self.enemies:
+                enemy.descend(70)
+                enemy.speed *= -1
+
+        # Collisions
+        hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
+        if hits:
+            self.player.score += len(hits) * 10
+
+        if pg.sprite.spritecollideany(self.player, self.enemies):
+            self.player.lives -= 1
+            if self.player.lives <= 0:
+                self.game.quit()
+
+        if len(self.enemies) == 0:
+            self.generate_ennemies()
 
     def draw(self, surface):
         super().draw(surface)
-        text = self.font.render("Ecran jeu", True, (255, 255, 255))
-        surface.blit(text, (100, 100))
         self.all_sprites.draw(surface)
+        self.bullets.draw(surface)
+
+        # Score et vies
+        score_text = self.font_score.render(
+            str(self.player.score), True, (255, 255, 255)
+        )
+        lives_text = self.font_lives.render(
+            str(self.player.lives), True, (255, 255, 255)
+        )
+        surface.blit(score_text, (10, 10))
+        surface.blit(lives_text, (self.width - 120, 10))
