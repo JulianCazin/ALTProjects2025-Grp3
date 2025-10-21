@@ -17,7 +17,9 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = speed
 
     def update(self):
+        """Met à jour la position de la balle"""
         self.rect.x += self.vx
         self.rect.y += self.vy
+        # Supprimer la balle si elle sort de l’écran
         if self.rect.bottom < 0:
             self.kill()
