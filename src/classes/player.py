@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # Charger le sprite du joueur
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (70, 70))  # redimensionner
+        self.image = pygame.transform.scale(self.image, (100, 100))  # redimensionner
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y

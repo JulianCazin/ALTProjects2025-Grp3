@@ -7,14 +7,14 @@ from classes.bullet import Bullet
 from classes.enemy import Enemy
 
 
-PLAYER_IMG = "src/assets/alien_1.png"
+PLAYER_IMG = "src/assets/vaisseau.png"
 ENEMY_IMG = [
     "src/assets/alien_1.png",
     "src/assets/alien_2.png",
     "src/assets/alien_3.png",
     "src/assets/alien_4.png",
 ]
-BULLET_IMG = "src/assets/alien_1.png"
+BULLET_IMG = "src/assets/bullet.png"
 
 
 class Screen:
@@ -100,6 +100,7 @@ class GameScreen(Screen):
         self.all_sprites = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
+        self.enemy_bullets = pg.sprite.Group()
 
         # Joueur
         self.player = Player(
@@ -141,14 +142,24 @@ class GameScreen(Screen):
         self.bullets.update()
 
         # Mise à jour ennemis
+
         edge_reached = False
         for enemy in self.enemies:
             if enemy.update(self.width):
                 edge_reached = True
+
+                # Chaque ennemi essaie de tirer selon son timer interne
+            enemy.try_to_shoot(
+                self.enemy_bullets, Bullet, "src/assets/enemy_bullet.png"
+            )
+
         if edge_reached:
             for enemy in self.enemies:
                 enemy.descend(70)
                 enemy.speed *= -1
+
+        # Mise à jour des balles ennemies
+        self.enemy_bullets.update()
 
         # Collisions
         hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
@@ -167,6 +178,7 @@ class GameScreen(Screen):
         super().draw(surface)
         self.all_sprites.draw(surface)
         self.bullets.draw(surface)
+        self.enemy_bullets.draw(surface)
 
         # Score et vies
         score_text = self.font_score.render(
