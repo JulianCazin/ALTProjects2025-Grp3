@@ -24,7 +24,12 @@ class Enemy(pygame.sprite.Sprite):
             return True
         return False
 
-    def descend(self, distance=70):
+    def shoot(self, bullet_group, bullet_class, bullet_img):
+        """Créer une bullet et ajouter au groupe bullets"""
+        bullet = bullet_class(self.rect.centerx, self.rect.bottom, bullet_img, speed=5)
+        bullet_group.add(bullet)
+
+    def descend(self, distance=20):
         """Fait descendre l'ennemi d'un cran"""
         self.rect.y += distance
 
