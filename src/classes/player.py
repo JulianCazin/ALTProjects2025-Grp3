@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # Charger le sprite du joueur
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (50, 40))  # redimensionner
+        self.image = pygame.transform.scale(self.image, (70, 70))  # redimensionner
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -32,11 +32,28 @@ class Player(pygame.sprite.Sprite):
         bullet_group.add(bullet)
 
     # fonction de tir en éventail
+
     def shoot_spread(self, bullet_group, bullet_class, bullet_img):
-        """Créer trois bullets en éventail et les ajouter au groupe bullets"""
-        offsets = [-15, 0, 15]
-        for offset in offsets:
-            bullet = bullet_class(self.rect.centerx + offset, self.rect.top, bullet_img)
+        """
+        Crée trois balles en éventail :
+        - gauche → diagonale haut-gauche
+        - milieu → tout droit vers le haut
+        - droite → diagonale haut-droite
+        """
+        bullets_data = [
+            {"offset": -15, "vx": -3, "vy": -8},  # diagonale gauche
+            {"offset": 0, "vx": 0, "vy": -8},  # tout droit
+            {"offset": 15, "vx": 3, "vy": -8},  # diagonale droite
+        ]
+
+        for data in bullets_data:
+            bullet = bullet_class(
+                x=self.rect.centerx + data["offset"],
+                y=self.rect.top,
+                image_path=bullet_img,
+                vx=data["vx"],
+                vy=data["vy"],
+            )
             bullet_group.add(bullet)
 
     # fonctions d’affichage
