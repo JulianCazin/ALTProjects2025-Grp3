@@ -166,7 +166,17 @@ class GameScreen(Screen):
         if hits:
             self.player.score += len(hits) * 10
 
+        # Collision joueur / ennemis
         if pg.sprite.spritecollideany(self.player, self.enemies):
+            self.player.lives -= 1
+            if self.player.lives <= 0:
+                self.game.quit()
+
+        # Collision joueur / balles ennemies
+        enemy_hits = pg.sprite.spritecollide(
+            self.player, self.enemy_bullets, dokill=True
+        )
+        if enemy_hits:
             self.player.lives -= 1
             if self.player.lives <= 0:
                 self.game.quit()
