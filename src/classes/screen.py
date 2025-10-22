@@ -5,6 +5,7 @@ import pygame as pg
 from classes.player import Player
 from classes.bullet import Bullet
 from classes.enemy import Enemy
+from classes.effects import EffectsManager
 
 
 PLAYER_IMG = "src/assets/vaisseau.png"
@@ -101,6 +102,7 @@ class GameScreen(Screen):
         self.bullets = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
         self.enemy_bullets = pg.sprite.Group()
+        self.effects = EffectsManager()
 
         # Joueur
         self.player = Player(
@@ -137,6 +139,17 @@ class GameScreen(Screen):
 
         self.enemy_direction = 1
 
+    def generate_boss(self):
+        boss = Enemy(
+            x=self.width // 2 - 100,
+            y=50,
+            image_path="src/assets/boss.png",
+            speed=2,
+            boss=True,
+        )
+        self.enemies.add(boss)
+        self.all_sprites.add(boss)
+
     def update(self, dt):
         self.player.update(self.width)
         self.bullets.update()
@@ -164,6 +177,7 @@ class GameScreen(Screen):
         # Collisions
         hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
         if hits:
+            self.effects.play_explosion()  # jouer le son d'explosion
             self.player.score += len(hits) * 10
 
         # Collision joueur / ennemis
@@ -177,11 +191,14 @@ class GameScreen(Screen):
             self.player, self.enemy_bullets, dokill=True
         )
         if enemy_hits:
+            self.effects.play_hit()  # jouer le son de hit
             self.player.lives -= 1
             if self.player.lives <= 0:
                 self.game.quit()
 
         if len(self.enemies) == 0:
+            self.player.lives += 1  # donner une vie bonus
+            self.effects.play_wave_clear()  # jouer le son de vague terminée
             self.generate_ennemies()
 
     def draw(self, surface):
