@@ -6,10 +6,11 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # Charger le sprite du joueur
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (70, 70))  # redimensionner
-        self.rect = self.image.get_rect()
-        self.rect.centerx = x
-        self.rect.bottom = y
+        self.image = pygame.transform.scale(self.image, (100, 100))  # redimensionner
+        self.rect = self.image.get_rect(center=(x, y))
+        old_center = self.rect.center
+        self.rect.inflate_ip(-self.rect.width * 0.3, -self.rect.height * 0.3)
+        self.rect.center = old_center
 
         # variables de jeu
         self.speed = speed

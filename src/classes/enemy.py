@@ -1,4 +1,5 @@
 import pygame
+import random
 
 
 # Classe représentant un ennemi classic qui se déplace horizontalement et descend d'un cran à chaque bord atteint
@@ -7,13 +8,17 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         # Charger l’image de l’alien
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (70, 70))
+        self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
         # Vitesse horizontale
         self.speed = speed
+
+        # Timer pour tirs aléatoires
+        self.shoot_timer = random.randint(1000, 4000)  # en millisecondes
+        self.last_shot_time = pygame.time.get_ticks()
 
     def move(self, screen_width):
         """Déplace l'ennemi horizontalement"""
@@ -24,20 +29,21 @@ class Enemy(pygame.sprite.Sprite):
             return True
         return False
 
-    def shoot(self, bullet_group, bullet_class, bullet_img):
-        """Créer une bullet et ajouter au groupe bullets"""
-        bullet = bullet_class(self.rect.centerx, self.rect.bottom, bullet_img, speed=5)
-        bullet_group.add(bullet)
-
     def descend(self, distance=20):
         """Fait descendre l'ennemi d'un cran"""
         self.rect.y += distance
 
-    def update(self, screen_width):
-        """Met à jour le mouvement de l'ennemi"""
-        edge_reached = self.move(screen_width)
-        return edge_reached  # sert au Game Manager
+    def try_to_shoot(self, bullet_group, bullet_class, bullet_img):
+        """Fait tirer l'ennemi de façon aléatoire selon son timer interne"""
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_shot_time > self.shoot_timer:
+            bullet = bullet_class(self.rect.centerx, self.rect.bottom, bullet_img, vy=5)
+            bullet_group.add(bullet)
 
-    def draw(self, screen):
-        """Affiche l'ennemi à l'écran"""
-        screen.blit(self.image, self.rect)
+            # Réinitialiser le timer avec un nouveau délai aléatoire
+            self.last_shot_time = current_time
+            self.shoot_timer = random.randint(3000, 8000)  # 3s à 8s entre tirs
+
+    def update(self, screen_width):
+        edge_reached = self.move(screen_width)
+        return edge_reached
