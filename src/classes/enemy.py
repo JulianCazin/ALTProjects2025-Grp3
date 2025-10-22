@@ -4,7 +4,7 @@ import random
 
 # Classe représentant un ennemi classic qui se déplace horizontalement et descend d'un cran à chaque bord atteint
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, image_path, speed=2):
+    def __init__(self, x, y, image_path, speed=2, boss=False):
         super().__init__()
         # Charger l’image de l’alien
         self.image = pygame.image.load(image_path).convert_alpha()
@@ -12,6 +12,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.boss = boss
 
         # Vitesse horizontale
         self.speed = speed
@@ -32,6 +33,17 @@ class Enemy(pygame.sprite.Sprite):
     def descend(self, distance=20):
         """Fait descendre l'ennemi d'un cran"""
         self.rect.y += distance
+
+    def boss_shoot(self, bullet_group, bullet_class, bullet_img):
+        """Fait tirer le boss en mode rafale"""
+        for offset in [-30, 0, 30]:  # trois tirs en éventail
+            bullet = bullet_class(
+                x=self.rect.centerx + offset,
+                y=self.rect.bottom,
+                image_path=bullet_img,
+                vy=5,
+            )
+            bullet_group.add(bullet)
 
     def try_to_shoot(self, bullet_group, bullet_class, bullet_img):
         """Fait tirer l'ennemi de façon aléatoire selon son timer interne"""

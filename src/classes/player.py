@@ -1,4 +1,5 @@
 import pygame
+from classes.effects import EffectsManager
 
 
 class Player(pygame.sprite.Sprite):
@@ -11,6 +12,7 @@ class Player(pygame.sprite.Sprite):
         old_center = self.rect.center
         self.rect.inflate_ip(-self.rect.width * 0.3, -self.rect.height * 0.3)
         self.rect.center = old_center
+        self.effect = EffectsManager()
 
         # variables de jeu
         self.speed = speed
@@ -31,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         """Créer une bullet et ajouter au groupe bullets"""
         bullet = bullet_class(self.rect.centerx, self.rect.top, bullet_img)
         bullet_group.add(bullet)
+        self.effect.play_shoot()  # jouer le son de tir
 
     # fonction de tir en éventail
 
@@ -41,6 +44,7 @@ class Player(pygame.sprite.Sprite):
         - milieu → tout droit vers le haut
         - droite → diagonale haut-droite
         """
+        self.effect.play_shoot()  # jouer le son de tir
         bullets_data = [
             {"offset": -15, "vx": -3, "vy": -8},  # diagonale gauche
             {"offset": 0, "vx": 0, "vy": -8},  # tout droit
