@@ -8,10 +8,10 @@ class EffectsManager:
         self.snd_shoot = pygame.mixer.Sound("src/assets/sounds/shoot.wav")
         self.snd_explosion = pygame.mixer.Sound("src/assets/sounds/explosion.wav")
         self.snd_hit = pygame.mixer.Sound("src/assets/sounds/hit.wav")
-        # self.snd_gameover = pygame.mixer.Sound("src/assets/sounds/gameover.wav")
+        self.snd_gameover = pygame.mixer.Sound("src/assets/sounds/gameover.wav")
         self.snd_wave_clear = pygame.mixer.Sound("src/assets/sounds/wave_clear.wav")
-        # self.snd_boss_spawn = pygame.mixer.Sound("src/assets/sounds/boss_spawn.wav")
-        # self.snd_boss_dead = pygame.mixer.Sound("src/assets/sounds/boss_dead.wav")
+        self.snd_boss_spawn = pygame.mixer.Sound("src/assets/sounds/boss_spawn.wav")
+        self.snd_boss_dead = pygame.mixer.Sound("src/assets/sounds/boss_dead.wav")
 
         self.particles = pygame.sprite.Group()
 
