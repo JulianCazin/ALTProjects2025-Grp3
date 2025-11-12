@@ -170,7 +170,7 @@ class GameScreen(Screen):
 
         # Collision joueur / ennemis
         if pg.sprite.spritecollideany(self.player, self.enemies):
-            self.player_hit(1)
+            self.player.player_hit(1)
             if self.player.lives <= 0:
                 self.game.quit()
 
