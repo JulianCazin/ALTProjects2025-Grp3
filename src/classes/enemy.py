@@ -6,7 +6,9 @@ from classes.bullet import Bullet
 
 # Class representing a classic enemy who moves horizontaly and falls down every time it reaches an edge
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, image_path, speed=3):
+
+    def __init__(self, x, y, image_path, speed=3, is_boss=False):
+
         super().__init__()
         # Load alien sprite
         self.image = pygame.image.load(image_path).convert_alpha()
@@ -14,6 +16,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.is_boss = is_boss
 
         # Horizontal speed
         self.speed = speed
@@ -35,6 +38,17 @@ class Enemy(pygame.sprite.Sprite):
         """Make enemy goes down a certain value"""
         self.rect.y += distance
 
+    def boss_shoot(self, bullet_group, bullet_class, bullet_img):
+        """Make the boss shooting in blast mode"""
+        for offset in [-30, 0, 30]:  # three bullets: left, center, right
+            bullet = bullet_class(
+                x=self.rect.centerx + offset,
+                y=self.rect.bottom,
+                image_path=bullet_img,
+                vy=5,
+            )
+            bullet_group.add(bullet)
+
     def edge_reached(self):
         """Make enemy goes down and changes his movement orientation"""
         self.descend(70)
@@ -42,9 +56,12 @@ class Enemy(pygame.sprite.Sprite):
 
     def try_to_shoot(self, bullet_group):
         """Make the enemy randomly shoots with his intern timer"""
+
         current_time = pygame.time.get_ticks()
         if current_time - self.last_shot_time > self.shoot_timer:
-            bullet = Bullet(self.rect.centerx, self.rect.bottom, "src/assets/enemy_bullet.png", vy=5)
+            bullet = Bullet(
+                self.rect.centerx, self.rect.bottom, "src/assets/enemy_bullet.png", vy=5
+            )
             bullet_group.add(bullet)
 
             # Reset the timer with a new random duration

@@ -1,4 +1,5 @@
 import pygame
+from classes.effects import EffectsManager
 
 
 class Player(pygame.sprite.Sprite):
@@ -11,6 +12,7 @@ class Player(pygame.sprite.Sprite):
         old_center = self.rect.center
         self.rect.inflate_ip(-self.rect.width * 0.3, -self.rect.height * 0.3)
         self.rect.center = old_center
+        self.effect = EffectsManager()
 
         # game variables
         self.speed = speed
@@ -31,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         """Create a bullet and add to the bullets group"""
         bullet = bullet_class(self.rect.centerx, self.rect.top, bullet_img)
         bullet_group.add(bullet)
+        self.effect.play_shoot()  # jouer le son de tir
 
     # Spread shooting function
 
@@ -41,6 +44,7 @@ class Player(pygame.sprite.Sprite):
         - middle → straight line
         - right → diagonal up-right
         """
+        self.effect.play_shoot()  # jouer le son de tir
         bullets_data = [
             {"offset": -15, "vx": -3, "vy": -8},  # diagonal left
             {"offset": 0, "vx": 0, "vy": -8},  # straight line
