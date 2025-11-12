@@ -194,15 +194,15 @@ class GameScreen(Screen):
             self.player, self.enemy_bullets, dokill=True
         )
         if enemy_hits:
-            self.effects.play_hit()  # jouer le son de hit
+            self.effects.play_hit()  # play hit sound
             self.player.lives -= 1
             if self.player.lives <= 0:
                 self.game.quit()
 
         if len(self.enemies) == 0:
             if self.player.lives < 5:
-                self.player.lives += 1  # donner une vie bonus
-            self.effects.play_wave_clear()  # jouer le son de vague terminée
+                self.player.lives += 1  # give a bonus life
+            self.effects.play_wave_clear()  # play wave clear sound
             self.generate_ennemies()
 
     def draw(self, surface):
@@ -212,7 +212,7 @@ class GameScreen(Screen):
         self.enemy_bullets.draw(surface)
         self.effects.draw(surface)
 
-        # Score et vies
+        # Score and lives
         score_text = self.font_score.render(
             str(self.player.score), True, (255, 255, 255)
         )

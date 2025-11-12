@@ -25,13 +25,6 @@ class EffectsManager:
             self.particles.add(particle)
         self.snd_explosion.play()
 
-    def hit_flash(self, sprite):
-        """Fait clignoter un sprite brièvement"""
-        flash = pygame.Surface(sprite.rect.size)
-        flash.fill((255, 255, 255))
-        flash.set_alpha(100)
-        sprite.image.blit(flash, (0, 0))
-
     # === SOUND EFFECTS ===
     def play_shoot(self):
         self.snd_shoot.play()
