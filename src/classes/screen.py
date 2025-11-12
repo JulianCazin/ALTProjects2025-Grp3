@@ -150,13 +150,11 @@ class GameScreen(Screen):
 
                 # Chaque ennemi essaie de tirer selon son timer interne
             enemy.try_to_shoot(
-                self.enemy_bullets, Bullet, "src/assets/enemy_bullet.png"
-            )
+                self.enemy_bullets, Bullet)
 
         if edge_reached:
             for enemy in self.enemies:
-                enemy.descend(70)
-                enemy.speed *= -1
+                enemy.edge_reached()
 
         # Mise à jour des balles ennemies
         self.enemy_bullets.update()
