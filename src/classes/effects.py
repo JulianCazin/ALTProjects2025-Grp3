@@ -17,8 +17,8 @@ class EffectsManager:
 
         self.snd_explosion.set_volume(0.2)
 
-    # === EFFETS VISUELS ===
-    def explosion(self, x, y, color=(255, 100, 0)):
+    # === VISUAL EFFETS  ===
+    def explosion(self, x, y, color=(164, 185, 7)):
         """Crée une petite explosion de particules"""
         for _ in range(10):
             particle = Particle(x, y, color)
@@ -32,7 +32,7 @@ class EffectsManager:
         flash.set_alpha(100)
         sprite.image.blit(flash, (0, 0))
 
-    # === EFFETS SONORES ===
+    # === SOUND EFFECTS ===
     def play_shoot(self):
         self.snd_shoot.play()
 
@@ -54,7 +54,7 @@ class EffectsManager:
     def play_boss_dead(self):
         self.snd_boss_dead.play()
 
-    # === MISE À JOUR ===
+    # === UPDATE ===
     def update(self):
         self.particles.update()
 
@@ -63,7 +63,7 @@ class EffectsManager:
 
 
 class Particle(pygame.sprite.Sprite):
-    """Simple particule animée (explosion, tir, etc.)"""
+    """Simple animated particle (explosion, shot, etc.)"""
 
     def __init__(self, x, y, color):
         super().__init__()

@@ -153,6 +153,7 @@ class GameScreen(Screen):
     def update(self, dt):
         self.player.update(self.width)
         self.bullets.update()
+        self.effects.update()
 
         # Mise à jour ennemis
 
@@ -177,7 +178,9 @@ class GameScreen(Screen):
         # Collisions
         hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
         if hits:
-            self.effects.play_explosion()  # jouer le son d'explosion
+            self.effects.play_explosion()  # play explosion sound
+            for enemy in hits:
+                self.effects.explosion(enemy.rect.centerx, enemy.rect.centery)
             self.player.score += len(hits) * 10
 
         # Collision joueur / ennemis
@@ -207,6 +210,7 @@ class GameScreen(Screen):
         self.all_sprites.draw(surface)
         self.bullets.draw(surface)
         self.enemy_bullets.draw(surface)
+        self.effects.draw(surface)
 
         # Score et vies
         score_text = self.font_score.render(
