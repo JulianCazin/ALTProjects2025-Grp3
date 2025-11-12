@@ -85,3 +85,25 @@ class Button:
     def draw(self, screen):
         """Affiche le bouton sur l’écran cible."""
         screen.blit(self.button_surface, self.button_rect)
+
+
+class BlinkingText:
+    def __init__(
+        self, text, font_path, size, pos, color=(255, 255, 255), blink_interval=500
+    ):
+        self.font = pg.font.Font(font_path, size)
+        self.text_surface = self.font.render(text, True, color)
+        self.rect = self.text_surface.get_rect(center=pos)
+        self.blink_interval = blink_interval  # en ms
+        self.visible = True
+        self.last_toggle = pg.time.get_ticks()
+
+    def update(self):
+        now = pg.time.get_ticks()
+        if now - self.last_toggle >= self.blink_interval:
+            self.visible = not self.visible
+            self.last_toggle = now
+
+    def draw(self, surface):
+        if self.visible:
+            surface.blit(self.text_surface, self.rect)
