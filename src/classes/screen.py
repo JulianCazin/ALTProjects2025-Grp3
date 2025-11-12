@@ -142,8 +142,7 @@ class GameScreen(Screen):
             enemy_img = random.choice(ENEMY_IMG)
             for col in range(8):
                 enemy = Enemy(
-                    x=80 + col * 80, y=50 + row * 60, image_path=enemy_img, speed=3
-                )
+                    x=80 + col * 80, y=50 + row * 60, image_path=enemy_img)
                 self.enemies.add(enemy)
                 self.all_sprites.add(enemy)
 
@@ -175,14 +174,13 @@ class GameScreen(Screen):
         for enemy in self.enemies:
             if enemy.update(self.width):
                 edge_reached = True
-            enemy.try_to_shoot(
-                self.enemy_bullets, Bullet, "src/assets/enemy_bullet.png"
-            )
+
+                # Chaque ennemi essaie de tirer selon son timer interne
+            enemy.try_to_shoot(self.enemy_bullets)
 
         if edge_reached:
             for enemy in self.enemies:
-                enemy.descend(70)
-                enemy.speed *= -1
+                enemy.edge_reached()
 
         # Mise à jour des balles ennemies
         self.enemy_bullets.update()
