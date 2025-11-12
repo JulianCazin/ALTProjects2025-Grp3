@@ -145,8 +145,7 @@ class GameScreen(Screen):
         for row in range(4):
             enemy_img = random.choice(ENEMY_IMG)
             for col in range(8):
-                enemy = Enemy(
-                    x=80 + col * 80, y=50 + row * 60, image_path=enemy_img)
+                enemy = Enemy(x=80 + col * 80, y=50 + row * 60, image_path=enemy_img)
                 self.enemies.add(enemy)
                 self.all_sprites.add(enemy)
 
@@ -169,7 +168,6 @@ class GameScreen(Screen):
         self.enemies.empty()
         self.all_sprites.empty()
         self.all_sprites.add(self.player)
-
 
     def update(self, dt):
         # Si on attend la prochaine vague, on ne met pas à jour le gameplay
@@ -221,9 +219,9 @@ class GameScreen(Screen):
         if enemy_hits:
 
             self.effects.play_hit()  # play hit sound
-            self.player.player_hit(1)  
-            
-        # --- Quand la vague est finie ---
+            self.player.player_hit(1)
+
+        # when all enemies are defeated (wave cleared)
         if len(self.enemies) == 0 and not self.waiting_next_wave:
             if self.player.lives < 5:
                 self.player.lives += 1  # give a bonus life

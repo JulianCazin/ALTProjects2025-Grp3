@@ -4,7 +4,7 @@ import random
 
 class EffectsManager:
     def __init__(self):
-        # Charger les sons
+        # load sounds
         self.snd_shoot = pygame.mixer.Sound("src/assets/sounds/shoot.wav")
         self.snd_explosion = pygame.mixer.Sound("src/assets/sounds/explosion.wav")
         self.snd_hit = pygame.mixer.Sound("src/assets/sounds/hit.wav")

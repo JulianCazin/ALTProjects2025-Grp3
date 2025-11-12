@@ -7,7 +7,7 @@ from classes.bullet import Bullet
 # Class representing a classic enemy who moves horizontaly and falls down every time it reaches an edge
 class Enemy(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, image_path, speed=3, boss=False):
+    def __init__(self, x, y, image_path, speed=3, is_boss=False):
 
         super().__init__()
         # Load alien sprite
@@ -16,7 +16,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.boss = boss
+        self.is_boss = is_boss
 
         # Horizontal speed
         self.speed = speed
@@ -38,10 +38,9 @@ class Enemy(pygame.sprite.Sprite):
         """Make enemy goes down a certain value"""
         self.rect.y += distance
 
-
     def boss_shoot(self, bullet_group, bullet_class, bullet_img):
         """Make the boss shooting in blast mode"""
-        for offset in [-30, 0, 30]:  # trois tirs en éventail
+        for offset in [-30, 0, 30]:  # three bullets: left, center, right
             bullet = bullet_class(
                 x=self.rect.centerx + offset,
                 y=self.rect.bottom,
@@ -60,7 +59,9 @@ class Enemy(pygame.sprite.Sprite):
 
         current_time = pygame.time.get_ticks()
         if current_time - self.last_shot_time > self.shoot_timer:
-            bullet = Bullet(self.rect.centerx, self.rect.bottom, "src/assets/enemy_bullet.png", vy=5)
+            bullet = Bullet(
+                self.rect.centerx, self.rect.bottom, "src/assets/enemy_bullet.png", vy=5
+            )
             bullet_group.add(bullet)
 
             # Reset the timer with a new random duration
