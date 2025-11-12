@@ -1,4 +1,5 @@
 import sys
+from classes.button import BlinkingText
 from classes.screen import MenuScreen
 import pygame as pg
 

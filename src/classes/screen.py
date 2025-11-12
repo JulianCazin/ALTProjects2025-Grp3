@@ -1,5 +1,6 @@
 import random
-from classes.button import Button
+from time import sleep
+from classes.button import BlinkingText, Button
 import pygame as pg
 
 from classes.player import Player
@@ -111,6 +112,17 @@ class GameScreen(Screen):
         )
         self.all_sprites.add(self.player)
 
+        self.waiting_next_wave = False
+        self.next_wave_start_time = 0
+        self.wait_duration = 2000  # en ms (2 secondes)
+        self.wave_text = BlinkingText(
+            "NEXT WAVE",
+            "src/assets/font/space_zinzins.ttf",
+            72,
+            (self.width // 2, self.height // 2),
+            blink_interval=400,
+        )
+
         self.generate_ennemies()
 
         self.font_score = pg.font.Font("src/assets/font/space_zinzins.ttf", 36)
@@ -137,18 +149,32 @@ class GameScreen(Screen):
 
         self.enemy_direction = 1
 
+    def clear_sprites(self):
+        self.bullets.empty()
+        self.enemy_bullets.empty()
+        self.enemies.empty()
+        self.all_sprites.empty()
+        self.all_sprites.add(self.player)
+
     def update(self, dt):
+        # Si on attend la prochaine vague, on ne met pas à jour le gameplay
+        if self.waiting_next_wave:
+            self.clear_sprites()
+            self.wave_text.update()
+            # Vérifie si le délai est écoulé
+            if pg.time.get_ticks() - self.next_wave_start_time > self.wait_duration:
+                self.waiting_next_wave = False
+                self.generate_ennemies()
+            return
+
         self.player.update(self.width)
         self.bullets.update()
 
         # Mise à jour ennemis
-
         edge_reached = False
         for enemy in self.enemies:
             if enemy.update(self.width):
                 edge_reached = True
-
-                # Chaque ennemi essaie de tirer selon son timer interne
             enemy.try_to_shoot(
                 self.enemy_bullets, Bullet, "src/assets/enemy_bullet.png"
             )
@@ -166,13 +192,11 @@ class GameScreen(Screen):
         if hits:
             self.player.score += len(hits) * 10
 
-        # Collision joueur / ennemis
         if pg.sprite.spritecollideany(self.player, self.enemies):
             self.player.lives -= 1
             if self.player.lives <= 0:
                 self.game.quit()
 
-        # Collision joueur / balles ennemies
         enemy_hits = pg.sprite.spritecollide(
             self.player, self.enemy_bullets, dokill=True
         )
@@ -181,8 +205,10 @@ class GameScreen(Screen):
             if self.player.lives <= 0:
                 self.game.quit()
 
-        if len(self.enemies) == 0:
-            self.generate_ennemies()
+        # --- Quand la vague est finie ---
+        if len(self.enemies) == 0 and not self.waiting_next_wave:
+            self.waiting_next_wave = True
+            self.next_wave_start_time = pg.time.get_ticks()
 
     def draw(self, surface):
         super().draw(surface)
@@ -199,3 +225,7 @@ class GameScreen(Screen):
         )
         surface.blit(score_text, (10, 10))
         surface.blit(lives_text, (self.width - 120, 10))
+
+        # --- Affiche le texte clignotant entre deux vagues ---
+        if self.waiting_next_wave:
+            self.wave_text.draw(surface)
