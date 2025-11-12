@@ -6,7 +6,7 @@ from classes.bullet import Bullet
 
 # Class representing a classic enemy who moves horizontaly and falls down every time it reaches an edge
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, image_path, speed=2):
+    def __init__(self, x, y, image_path, speed=3):
         super().__init__()
         # Load alien sprite
         self.image = pygame.image.load(image_path).convert_alpha()
