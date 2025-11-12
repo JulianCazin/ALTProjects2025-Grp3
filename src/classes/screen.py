@@ -166,7 +166,7 @@ class GameScreen(Screen):
         # Collisions
         hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
         if hits:
-            self.add_score(len(hits) * 10)
+            self.player.add_score(len(hits) * 10)
 
         # Collision joueur / ennemis
         if pg.sprite.spritecollideany(self.player, self.enemies):
