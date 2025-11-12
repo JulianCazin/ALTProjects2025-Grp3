@@ -197,7 +197,8 @@ class GameScreen(Screen):
                 self.game.quit()
 
         if len(self.enemies) == 0:
-            self.player.lives += 1  # donner une vie bonus
+            if self.player.lives < 5:
+                self.player.lives += 1  # donner une vie bonus
             self.effects.play_wave_clear()  # jouer le son de vague terminée
             self.generate_ennemies()
 
