@@ -17,14 +17,16 @@ ENEMY_IMG = [
 ]
 BULLET_IMG = "src/assets/bullet.png"
 
+FONT = "src/assets/font/space_zinzins.ttf"
+
 
 class Screen:
     def __init__(self, game):
         self.game = game
 
         self.background = pg.image.load("src/assets/background.png")
-        self.title_font = pg.font.Font("src/assets/font/space_zinzins.ttf", 96)
-        self.font = pg.font.Font("src/assets/font/space_zinzins.ttf", 32)
+        self.title_font = pg.font.Font(FONT, 96)
+        self.font = pg.font.Font(FONT, 32)
         self.width, self.height = surface_width, surface_height = (
             self.game.screen.get_size()
         )
@@ -125,8 +127,8 @@ class GameScreen(Screen):
 
         self.generate_ennemies()
 
-        self.font_score = pg.font.Font("src/assets/font/space_zinzins.ttf", 36)
-        self.font_lives = pg.font.Font("src/assets/font/space_zinzins.ttf", 36)
+        self.font_score = pg.font.Font(FONT, 36)
+        self.font_lives = pg.font.Font(FONT, 36)
 
     def handle_events(self, events):
         for event in events:
@@ -188,10 +190,10 @@ class GameScreen(Screen):
         # Collisions
         hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
         if hits:
-            self.player.score += len(hits) * 10
+            self.player.add_score(len(hits) * 10)
 
         if pg.sprite.spritecollideany(self.player, self.enemies):
-            self.player.lives -= 1
+            self.player.player_hit(1)
             if self.player.lives <= 0:
                 self.game.quit()
 
@@ -199,9 +201,8 @@ class GameScreen(Screen):
             self.player, self.enemy_bullets, dokill=True
         )
         if enemy_hits:
-            self.player.lives -= 1
-            if self.player.lives <= 0:
-                self.game.quit()
+            self.player.player_hit(1)
+            
 
         # --- Quand la vague est finie ---
         if len(self.enemies) == 0 and not self.waiting_next_wave:

@@ -57,7 +57,20 @@ class Player(pygame.sprite.Sprite):
             )
             bullet_group.add(bullet)
 
+    def add_score(self, score):
+        self.score += score
+
+    # decrease the life's number of the player when he is hit by an ennemi
+    # before decrease we have to verify than the 
+    def player_hit(self, dammage):
+        self.lives -= dammage
+        if self.lives <= 0:
+            self.game.quit()
+            
+
     # fonctions d’affichage
     def draw(self, screen):
         """Affiche le joueur sur le screen"""
         screen.blit(self.image, self.rect)
+
+
