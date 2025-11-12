@@ -1,4 +1,5 @@
 import sys
+from classes.button import BlinkingText
 from classes.screen import MenuScreen
 import pygame as pg
 
@@ -14,7 +15,7 @@ class Game:
 
         self.clock = pg.time.Clock()
         self.running = True
-        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)  # fenetre fixe
+        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)  # fixed window
 
         self.current_screen = MenuScreen(self)
 
