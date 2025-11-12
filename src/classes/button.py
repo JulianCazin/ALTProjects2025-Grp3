@@ -16,8 +16,8 @@ class Button:
         hover_color=(102, 102, 102, 255),
         pressed_color=(51, 51, 51, 255),
         border_radius=0,
-        border_color=(0, 0, 0),  # <-- couleur de la bordure
-        border_width=0,  # <-- épaisseur de la bordure (0 = pas de bordure)
+        border_color=(0, 0, 0),
+        border_width=0,  # <-- 0 = no border
     ):
         self.x = x
         self.y = y
@@ -55,7 +55,7 @@ class Button:
             else:
                 self.already_pressed = False
 
-        # On efface et on dessine le rectangle
+        # We erase and draw the rectangle
         self.button_surface.fill((0, 0, 0, 0))  # transparent
         pg.draw.rect(
             self.button_surface,
@@ -63,7 +63,7 @@ class Button:
             (0, 0, self.width, self.height),
             border_radius=self.border_radius,
         )
-        # Dessine la bordure (si demandée)
+        # Draw the border (if required)
         if self.border_width > 0:
             pg.draw.rect(
                 self.button_surface,
@@ -73,7 +73,7 @@ class Button:
                 border_radius=self.border_radius,
             )
 
-        # Centre le texte
+        # Center the text
         self.button_surface.blit(
             self.button_surf,
             [
@@ -83,7 +83,7 @@ class Button:
         )
 
     def draw(self, screen):
-        """Affiche le bouton sur l’écran cible."""
+        """Display the button on the selected screen."""
         screen.blit(self.button_surface, self.button_rect)
 
 

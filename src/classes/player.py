@@ -4,47 +4,47 @@ import pygame
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, speed, image_path):
         super().__init__()
-        # Charger le sprite du joueur
+        # Load player's sprite
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))  # redimensionner
+        self.image = pygame.transform.scale(self.image, (100, 100))  # resize
         self.rect = self.image.get_rect(center=(x, y))
         old_center = self.rect.center
         self.rect.inflate_ip(-self.rect.width * 0.3, -self.rect.height * 0.3)
         self.rect.center = old_center
 
-        # variables de jeu
+        # game variables
         self.speed = speed
         self.lives = 3
         self.score = 0
 
-    # fonctions de mouvement et d’action
+    # movements and actions functions
     def update(self, screen_width):
-        """Met à jour la position du joueur selon les touches pressées"""
+        """Update player's position according to the keys pressed"""
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.rect.left > 0:
             self.rect.x -= self.speed
         if keys[pygame.K_RIGHT] and self.rect.right < screen_width:
             self.rect.x += self.speed
 
-    # fonction de tir basique
+    # Basic shooting function
     def shoot_basic(self, bullet_group, bullet_class, bullet_img):
-        """Créer une bullet et ajouter au groupe bullets"""
+        """Create a bullet and add to the bullets group"""
         bullet = bullet_class(self.rect.centerx, self.rect.top, bullet_img)
         bullet_group.add(bullet)
 
-    # fonction de tir en éventail
+    # Spread shooting function
 
     def shoot_spread(self, bullet_group, bullet_class, bullet_img):
         """
-        Crée trois balles en éventail :
-        - gauche → diagonale haut-gauche
-        - milieu → tout droit vers le haut
-        - droite → diagonale haut-droite
+        Create three spreaded bullets :
+        - left → diagonal up-left
+        - middle → straight line
+        - right → diagonal up-right
         """
         bullets_data = [
-            {"offset": -15, "vx": -3, "vy": -8},  # diagonale gauche
-            {"offset": 0, "vx": 0, "vy": -8},  # tout droit
-            {"offset": 15, "vx": 3, "vy": -8},  # diagonale droite
+            {"offset": -15, "vx": -3, "vy": -8},  # diagonal left
+            {"offset": 0, "vx": 0, "vy": -8},  # straight line
+            {"offset": 15, "vx": 3, "vy": -8},  # diagonal right
         ]
 
         for data in bullets_data:
@@ -68,9 +68,9 @@ class Player(pygame.sprite.Sprite):
             self.game.quit()
             
 
-    # fonctions d’affichage
+    # Display function
     def draw(self, screen):
-        """Affiche le joueur sur le screen"""
+        """Display the player on the screen"""
         screen.blit(self.image, self.rect)
 
 

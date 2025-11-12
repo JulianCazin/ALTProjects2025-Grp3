@@ -14,18 +14,18 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    """Fonction principale de l'application."""
-    logger.info("Démarrage du programme...")
+    """Main function of the program"""
+    logger.info("Program starting...")
 
     Game().run()
     logger.info("Game started.")
 
-    logger.info("Fin du programme.")
+    logger.info("End of the program.")
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.exception("Une erreur est survenue: %s", e)
+        logger.exception("An error occured: %s", e)
         sys.exit(1)
