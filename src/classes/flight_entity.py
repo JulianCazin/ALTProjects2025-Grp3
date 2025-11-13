@@ -3,11 +3,12 @@ import pygame as pg
 
 
 class FlightEntity(pg.sprite.Sprite):
+
     def __init__(self, x, y, image_path, vx=0, vy=-8):
         super().__init__()
-        # Charger l’image de la balle
-        self.image = pg.image.load(image_path).convert_alpha()  # Transparence
-        self.image = pg.transform.scale(self.image, (50, 30))  # redimensionner
+        # Load bullet's sprite
+        self.image = pg.image.load(image_path).convert_alpha()  # Transparency
+        self.image = pg.transform.scale(self.image, (50, 30))  # resize
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -18,20 +19,19 @@ class FlightEntity(pg.sprite.Sprite):
         self.rect.centerx = x
         self.rect.bottom = y
 
-        # Réduction de la hitbox
-        hitbox_scale = 0.5  # 50 % plus petite
+        # Reduce hitbox size
+        hitbox_scale = 0.5  # 50 % smaller
         self.rect.width = int(self.rect.width * (hitbox_scale**3))
         self.rect.height = int(self.rect.height * hitbox_scale)
-        self.rect.centerx = x  # recaler le centre
+        self.rect.centerx = x  # Recenter
         self.rect.bottom = y
 
     def update(self):
-        """Met à jour la position de la balle"""
+        """Update bullet's position"""
         self.rect.x += self.vx
         self.rect.y += self.vy
-        # Supprimer la balle si elle sort de l’écran
-        screen_height = pg.display.get_surface().get_height()
-        if self.rect.top > screen_height or self.rect.bottom < 0:
+        # Delete the bullet if it's outside of the screen
+        if self.rect.bottom < 0:
             self.kill()
 
 
