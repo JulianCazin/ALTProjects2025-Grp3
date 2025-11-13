@@ -81,7 +81,7 @@ class MenuScreen(Screen):
 
     def update(self, dt):
         for button in self.buttons:
-            button.process()  # Vérifie hover / clic
+            button.process()
 
     def draw(self, surface):
         super().draw(surface)
@@ -119,7 +119,7 @@ class GameScreen(Screen):
 
         self.waiting_next_wave = False
         self.next_wave_start_time = 0
-        self.wait_duration = 2000  # en ms (2 secondes)
+        self.wait_duration = 2000  # in ms (2 secondes)
         self.wave_text = BlinkingText(
             "NEXT WAVE",
             "src/assets/font/space_zinzins.ttf",
@@ -171,11 +171,9 @@ class GameScreen(Screen):
         self.all_sprites.add(self.player)
 
     def update(self, dt):
-        # Si on attend la prochaine vague, on ne met pas à jour le gameplay
         if self.waiting_next_wave:
             self.clear_sprites()
             self.wave_text.update()
-            # Vérifie si le délai est écoulé
             if pg.time.get_ticks() - self.next_wave_start_time > self.wait_duration:
                 self.waiting_next_wave = False
                 self.generate_ennemies()
@@ -189,20 +187,17 @@ class GameScreen(Screen):
         self.maybe_spawn_bonus()
         self.effects.update()
 
-        # Mise à jour ennemis
         edge_reached = False
         for enemy in self.enemies:
             if enemy.update(self.width):
                 edge_reached = True
 
-                # Chaque ennemi essaie de tirer selon son timer interne
             enemy.try_to_shoot(self.enemy_bullets)
 
         if edge_reached:
             for enemy in self.enemies:
                 enemy.edge_reached()
 
-        # Mise à jour des balles ennemies
         self.enemy_bullets.update()
 
         # Collisions
@@ -262,45 +257,34 @@ class GameScreen(Screen):
         surface.blit(score_text, (10, 10))
         surface.blit(lives_text, (self.width - 120, 10))
 
-        # --- Affiche le texte clignotant entre deux vagues ---
         if self.waiting_next_wave:
             self.wave_text.draw(surface)
 
     def maybe_spawn_bonus(self):
-        """Génère aléatoirement un bonus selon certaines conditions."""
+        """Generate bonus randomly based on conditions."""
 
-        # Limite du nombre de bonus actifs
         MAX_BONUS_ON_SCREEN = 2
 
-        # Probabilité de génération à chaque frame (1/600 ≈ ~1 bonus toutes les 10s à 60FPS)
         BONUS_SPAWN_CHANCE = 1 / 600
 
-        # Si déjà trop de bonus présents → on ne génère pas
         if len(self.bonus) >= MAX_BONUS_ON_SCREEN:
             return
 
-        # Test de probabilité
         if random.random() > BONUS_SPAWN_CHANCE:
             return
 
-        # Sélection aléatoire du type de bonus
         bonus_type = random.choices(
             [BonusDirector.create_shield_bonus, BonusDirector.create_spread_shot_bonus],
-            weights=[0.4, 0.6],  # 40% shield, 60% spread shot
+            weights=[0.4, 0.6],
         )[0]
 
-        # Création temporaire pour vérifier ses propriétés
-        temp_bonus = bonus_type(0, 0)  # on crée juste pour lire ses attributs
+        temp_bonus = bonus_type(0, 0)
 
-        # Conditions de génération
         if not temp_bonus.one_off_use and not temp_bonus._Bonus__is_reusable:
-            # Si c’est un bonus non réutilisable déjà utilisé → on ne le génère pas
             return
 
-        # Coordonnées aléatoires pour l’apparition
         x = random.randint(100, self.width - 100)
-        y = 0  # juste au-dessus de l’écran
+        y = 0
 
-        # Création réelle du bonus
         bonus = bonus_type(x, y)
         self.bonus.add(bonus)

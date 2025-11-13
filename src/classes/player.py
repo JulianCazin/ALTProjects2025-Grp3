@@ -52,17 +52,17 @@ class Player(pg.sprite.Sprite):
 
     def shoot_spread(self, *args, **kwargs):
         """
-        Crée trois balles en éventail :
-        - gauche → diagonale haut-gauche
-        - milieu → tout droit vers le haut
-        - droite → diagonale haut-droite
+        Create three spreaded bullets :
+        - left → diagonal up-left
+        - middle → straight line
+        - right → diagonal up-right
         """
         from classes.screen import BULLET_IMG
 
         bullet_group = kwargs.get("bullet_group", None)
         bonus = kwargs.get("bonus", None)
 
-        self.effect.play_shoot()  # jouer le son de tir
+        self.effect.play_shoot()
         bullets_data = [
             {"offset": -15, "vx": -3, "vy": -8},  # diagonal left
             {"offset": 0, "vx": 0, "vy": -8},  # straight line

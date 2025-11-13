@@ -76,11 +76,9 @@ class Bonus(FlightEntity):
 
 class BonusBuilder:
     def __init__(self, x, y, image_path):
-        # paramètres obligatoires
         self._x = x
         self._y = y
         self._image_path = image_path
-        # paramètres optionnels par défaut
         self._vx = 0
         self._vy = 8
         self._type = Bonus.SPREAD_SHOT
