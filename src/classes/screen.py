@@ -1,6 +1,6 @@
 import random
 from time import sleep
-from classes.button import BlinkingText, Button
+from classes.button import BlinkingText, Button, Modal
 import pygame as pg
 
 from classes.player import Player
@@ -127,6 +127,14 @@ class GameScreen(Screen):
             (self.width // 2, self.height // 2),
             blink_interval=400,
         )
+        self.game_over_text = BlinkingText(
+            "GAME OVER",
+            "src/assets/font/space_zinzins.ttf",
+            72,
+            (self.width // 2, self.height // 2),
+            blink_interval=600,
+        )
+        self.is_game_over = False
 
         self.generate_ennemies()
 
@@ -171,6 +179,9 @@ class GameScreen(Screen):
         self.all_sprites.add(self.player)
 
     def update(self, dt):
+        if self.is_game_over:
+            return
+
         if self.waiting_next_wave:
             self.clear_sprites()
             self.wave_text.update()
@@ -213,8 +224,6 @@ class GameScreen(Screen):
             and not self.player.almighty
         ):
             self.player.player_hit(1)
-            if self.player.lives <= 0:
-                self.game.quit()
 
         enemy_hits = pg.sprite.spritecollide(
             self.player, self.enemy_bullets, dokill=True
@@ -238,6 +247,9 @@ class GameScreen(Screen):
             self.player.collect_bonus(bonus_hits[0])
             bonus_hits[0].getting_collected()
 
+        if self.player.lives <= 0:
+            self.is_game_over = True
+
     def draw(self, surface):
         super().draw(surface)
         self.all_sprites.draw(surface)
@@ -247,18 +259,22 @@ class GameScreen(Screen):
         self.player.update_bonus(surface)
         self.effects.draw(surface)
 
-        # Score and lives
+        # Score et vies
         score_text = self.font_score.render(
             str(self.player.score), True, (255, 255, 255)
         )
         lives_text = self.font_lives.render(
             str(self.player.lives), True, (255, 255, 255)
         )
-        surface.blit(score_text, (10, 10))
-        surface.blit(lives_text, (self.width - 120, 10))
+        surface.blit(score_text, (25, 25))
+        surface.blit(lives_text, (self.width - 120, 25))
 
         if self.waiting_next_wave:
             self.wave_text.draw(surface)
+
+        # Affiche la modal si le jeu est terminé
+        if self.is_game_over:
+            self.game_over_modal(surface)
 
     def maybe_spawn_bonus(self):
         """Generate bonus randomly based on conditions."""
@@ -288,3 +304,47 @@ class GameScreen(Screen):
 
         bonus = bonus_type(x, y)
         self.bonus.add(bonus)
+
+    def game_over_modal(self, surface):
+        padding = 50
+        height = self.game.screen.get_height() - 2 * padding
+        width = self.game.screen.get_width() - 2 * padding
+        modal = (
+            Modal(height=height, width=width, x=padding, y=padding)
+            .set_background_color((0, 0, 0))
+            .set_opacity(160)
+            .set_border_radius(20)
+        )
+        x = self.game.screen.get_width() // 2 - 350 - 25
+        y = self.game.screen.get_height() // 2 + 50
+        replay_button = Button(
+            x=x,
+            y=y,
+            width=350,
+            height=60,
+            border_radius=16,
+            button_text="REPLAY",
+            on_click_function=lambda: self.game.set_screen(GameScreen(self.game)),
+        )
+        x = self.game.screen.get_width() // 2 + 25
+        menu_button = Button(
+            x=x,
+            y=y,
+            width=350,
+            height=60,
+            border_radius=16,
+            button_text="MAIN MENU",
+            text_color=(255, 255, 255),
+            color=(255, 255, 255, 0),
+            border_color=(255, 255, 255),
+            border_width=6,
+            on_click_function=lambda: self.game.set_screen(MenuScreen(self.game)),
+        )
+
+        replay_button.process()
+        menu_button.process()
+
+        modal.draw(surface)
+        self.game_over_text.draw(surface)
+        surface.blit(replay_button.button_surface, (replay_button.x, replay_button.y))
+        surface.blit(menu_button.button_surface, (menu_button.x, menu_button.y))

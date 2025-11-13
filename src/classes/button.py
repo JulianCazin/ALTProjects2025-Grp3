@@ -107,3 +107,35 @@ class BlinkingText:
     def draw(self, surface):
         if self.visible:
             surface.blit(self.text_surface, self.rect)
+
+
+class Modal:
+    def __init__(self, height, width, x=0, y=0):
+        self.surface = pg.Surface((width, height), pg.SRCALPHA)
+        self.rect = pg.Rect(x, y, width, height)
+        self.background_color = (0, 0, 0)
+        self.opacity = 255
+        self.border_radius = 0
+
+    def set_background_color(self, color):
+        self.background_color = color
+        return self
+
+    def set_opacity(self, opacity):
+        self.opacity = opacity
+        return self
+
+    def set_border_radius(self, radius):
+        self.border_radius = radius
+        return self
+
+    def draw(self, surface):
+        self.surface.fill((0, 0, 0, 0))  # clear old content
+        self.surface.set_alpha(self.opacity)
+        pg.draw.rect(
+            self.surface,
+            self.background_color,
+            self.surface.get_rect(),
+            border_radius=self.border_radius,
+        )
+        surface.blit(self.surface, self.rect.topleft)
