@@ -4,7 +4,7 @@ from classes.button import BlinkingText, Button
 import pygame as pg
 
 from classes.player import Player
-from classes.bullet import Bullet
+from classes.flight_entity import BonusDirector, FlightEntity
 from classes.enemy import Enemy
 from classes.effects import EffectsManager
 
@@ -106,6 +106,7 @@ class GameScreen(Screen):
         self.enemies = pg.sprite.Group()
         self.enemy_bullets = pg.sprite.Group()
         self.effects = EffectsManager()
+        self.bonus = pg.sprite.Group()
 
         # Joueur
         self.player = Player(
@@ -136,9 +137,9 @@ class GameScreen(Screen):
         for event in events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    self.player.shoot_basic(self.bullets, Bullet, BULLET_IMG)
+                    self.player.shoot_basic(self.bullets, FlightEntity, BULLET_IMG)
                 if event.key == pg.K_LALT:
-                    self.player.shoot_spread(self.bullets, Bullet, BULLET_IMG)
+                    self.player.consum_bonus(self.bullets)
 
     def generate_ennemies(self):
         # Ennemis
@@ -182,6 +183,10 @@ class GameScreen(Screen):
 
         self.player.update(self.width)
         self.bullets.update()
+        self.bonus.update()
+
+        # Bonus generation
+        self.maybe_spawn_bonus()
         self.effects.update()
 
         # Mise à jour ennemis
@@ -208,7 +213,10 @@ class GameScreen(Screen):
                 self.effects.explosion(enemy.rect.centerx, enemy.rect.centery)
             self.player.add_score(len(hits) * 10)
 
-        if pg.sprite.spritecollideany(self.player, self.enemies):
+        if (
+            pg.sprite.spritecollideany(self.player, self.enemies)
+            and not self.player.almighty
+        ):
             self.player.player_hit(1)
             if self.player.lives <= 0:
                 self.game.quit()
@@ -216,7 +224,7 @@ class GameScreen(Screen):
         enemy_hits = pg.sprite.spritecollide(
             self.player, self.enemy_bullets, dokill=True
         )
-        if enemy_hits:
+        if enemy_hits and not self.player.almighty:
 
             self.effects.play_hit()  # play hit sound
             self.player.player_hit(1)
@@ -229,11 +237,19 @@ class GameScreen(Screen):
             self.effects.play_wave_clear()  # play wave clear sound
             self.next_wave_start_time = pg.time.get_ticks()
 
+        # Collision player / bonus
+        bonus_hits = pg.sprite.spritecollide(self.player, self.bonus, dokill=True)
+        if bonus_hits:
+            self.player.collect_bonus(bonus_hits[0])
+            bonus_hits[0].getting_collected()
+
     def draw(self, surface):
         super().draw(surface)
         self.all_sprites.draw(surface)
         self.bullets.draw(surface)
         self.enemy_bullets.draw(surface)
+        self.bonus.draw(surface)
+        self.player.update_bonus(surface)
         self.effects.draw(surface)
 
         # Score and lives
@@ -249,3 +265,42 @@ class GameScreen(Screen):
         # --- Affiche le texte clignotant entre deux vagues ---
         if self.waiting_next_wave:
             self.wave_text.draw(surface)
+
+    def maybe_spawn_bonus(self):
+        """Génère aléatoirement un bonus selon certaines conditions."""
+
+        # Limite du nombre de bonus actifs
+        MAX_BONUS_ON_SCREEN = 2
+
+        # Probabilité de génération à chaque frame (1/600 ≈ ~1 bonus toutes les 10s à 60FPS)
+        BONUS_SPAWN_CHANCE = 1 / 600
+
+        # Si déjà trop de bonus présents → on ne génère pas
+        if len(self.bonus) >= MAX_BONUS_ON_SCREEN:
+            return
+
+        # Test de probabilité
+        if random.random() > BONUS_SPAWN_CHANCE:
+            return
+
+        # Sélection aléatoire du type de bonus
+        bonus_type = random.choices(
+            [BonusDirector.create_shield_bonus, BonusDirector.create_spread_shot_bonus],
+            weights=[0.4, 0.6],  # 40% shield, 60% spread shot
+        )[0]
+
+        # Création temporaire pour vérifier ses propriétés
+        temp_bonus = bonus_type(0, 0)  # on crée juste pour lire ses attributs
+
+        # Conditions de génération
+        if not temp_bonus.one_off_use and not temp_bonus._Bonus__is_reusable:
+            # Si c’est un bonus non réutilisable déjà utilisé → on ne le génère pas
+            return
+
+        # Coordonnées aléatoires pour l’apparition
+        x = random.randint(100, self.width - 100)
+        y = 0  # juste au-dessus de l’écran
+
+        # Création réelle du bonus
+        bonus = bonus_type(x, y)
+        self.bonus.add(bonus)
