@@ -259,7 +259,6 @@ class GameScreen(Screen):
         self.player.update_bonus(surface)
         self.effects.draw(surface)
 
-        # Score et vies
         score_text = self.font_score.render(
             str(self.player.score), True, (255, 255, 255)
         )
@@ -272,7 +271,6 @@ class GameScreen(Screen):
         if self.waiting_next_wave:
             self.wave_text.draw(surface)
 
-        # Affiche la modal si le jeu est terminé
         if self.is_game_over:
             self.game_over_modal(surface)
 
@@ -306,14 +304,12 @@ class GameScreen(Screen):
         self.bonus.add(bonus)
 
     def game_over_modal(self, surface):
-        padding = 50
-        height = self.game.screen.get_height() - 2 * padding
-        width = self.game.screen.get_width() - 2 * padding
+        height = self.game.screen.get_height()
+        width = self.game.screen.get_width()
         modal = (
-            Modal(height=height, width=width, x=padding, y=padding)
+            Modal(height=height, width=width, x=0, y=0)
             .set_background_color((0, 0, 0))
             .set_opacity(160)
-            .set_border_radius(20)
         )
         x = self.game.screen.get_width() // 2 - 350 - 25
         y = self.game.screen.get_height() // 2 + 50
