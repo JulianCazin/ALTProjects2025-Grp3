@@ -4,7 +4,7 @@ from classes.button import BlinkingText, Button
 import pygame as pg
 
 from classes.player import Player
-from classes.bullet import Bullet
+from classes.flight_entity import BonusDirector, FlightEntity
 from classes.enemy import Enemy
 from classes.effects import EffectsManager
 
@@ -81,7 +81,7 @@ class MenuScreen(Screen):
 
     def update(self, dt):
         for button in self.buttons:
-            button.process()  # Vérifie hover / clic
+            button.process()
 
     def draw(self, surface):
         super().draw(surface)
@@ -106,6 +106,7 @@ class GameScreen(Screen):
         self.enemies = pg.sprite.Group()
         self.enemy_bullets = pg.sprite.Group()
         self.effects = EffectsManager()
+        self.bonus = pg.sprite.Group()
 
         # Joueur
         self.player = Player(
@@ -118,7 +119,7 @@ class GameScreen(Screen):
 
         self.waiting_next_wave = False
         self.next_wave_start_time = 0
-        self.wait_duration = 2000  # en ms (2 secondes)
+        self.wait_duration = 2000  # in ms (2 secondes)
         self.wave_text = BlinkingText(
             "NEXT WAVE",
             "src/assets/font/space_zinzins.ttf",
@@ -136,9 +137,9 @@ class GameScreen(Screen):
         for event in events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    self.player.shoot_basic(self.bullets, Bullet, BULLET_IMG)
+                    self.player.shoot_basic(self.bullets, FlightEntity, BULLET_IMG)
                 if event.key == pg.K_LALT:
-                    self.player.shoot_spread(self.bullets, Bullet, BULLET_IMG)
+                    self.player.consum_bonus(self.bullets)
 
     def generate_ennemies(self):
         # Ennemis
@@ -170,11 +171,9 @@ class GameScreen(Screen):
         self.all_sprites.add(self.player)
 
     def update(self, dt):
-        # Si on attend la prochaine vague, on ne met pas à jour le gameplay
         if self.waiting_next_wave:
             self.clear_sprites()
             self.wave_text.update()
-            # Vérifie si le délai est écoulé
             if pg.time.get_ticks() - self.next_wave_start_time > self.wait_duration:
                 self.waiting_next_wave = False
                 self.generate_ennemies()
@@ -182,22 +181,23 @@ class GameScreen(Screen):
 
         self.player.update(self.width)
         self.bullets.update()
+        self.bonus.update()
+
+        # Bonus generation
+        self.maybe_spawn_bonus()
         self.effects.update()
 
-        # Mise à jour ennemis
         edge_reached = False
         for enemy in self.enemies:
             if enemy.update(self.width):
                 edge_reached = True
 
-                # Chaque ennemi essaie de tirer selon son timer interne
             enemy.try_to_shoot(self.enemy_bullets)
 
         if edge_reached:
             for enemy in self.enemies:
                 enemy.edge_reached()
 
-        # Mise à jour des balles ennemies
         self.enemy_bullets.update()
 
         # Collisions
@@ -208,7 +208,10 @@ class GameScreen(Screen):
                 self.effects.explosion(enemy.rect.centerx, enemy.rect.centery)
             self.player.add_score(len(hits) * 10)
 
-        if pg.sprite.spritecollideany(self.player, self.enemies):
+        if (
+            pg.sprite.spritecollideany(self.player, self.enemies)
+            and not self.player.almighty
+        ):
             self.player.player_hit(1)
             if self.player.lives <= 0:
                 self.game.quit()
@@ -216,7 +219,7 @@ class GameScreen(Screen):
         enemy_hits = pg.sprite.spritecollide(
             self.player, self.enemy_bullets, dokill=True
         )
-        if enemy_hits:
+        if enemy_hits and not self.player.almighty:
 
             self.effects.play_hit()  # play hit sound
             self.player.player_hit(1)
@@ -229,11 +232,19 @@ class GameScreen(Screen):
             self.effects.play_wave_clear()  # play wave clear sound
             self.next_wave_start_time = pg.time.get_ticks()
 
+        # Collision player / bonus
+        bonus_hits = pg.sprite.spritecollide(self.player, self.bonus, dokill=True)
+        if bonus_hits:
+            self.player.collect_bonus(bonus_hits[0])
+            bonus_hits[0].getting_collected()
+
     def draw(self, surface):
         super().draw(surface)
         self.all_sprites.draw(surface)
         self.bullets.draw(surface)
         self.enemy_bullets.draw(surface)
+        self.bonus.draw(surface)
+        self.player.update_bonus(surface)
         self.effects.draw(surface)
 
         # Score and lives
@@ -246,6 +257,34 @@ class GameScreen(Screen):
         surface.blit(score_text, (10, 10))
         surface.blit(lives_text, (self.width - 120, 10))
 
-        # --- Affiche le texte clignotant entre deux vagues ---
         if self.waiting_next_wave:
             self.wave_text.draw(surface)
+
+    def maybe_spawn_bonus(self):
+        """Generate bonus randomly based on conditions."""
+
+        MAX_BONUS_ON_SCREEN = 2
+
+        BONUS_SPAWN_CHANCE = 1 / 600
+
+        if len(self.bonus) >= MAX_BONUS_ON_SCREEN:
+            return
+
+        if random.random() > BONUS_SPAWN_CHANCE:
+            return
+
+        bonus_type = random.choices(
+            [BonusDirector.create_shield_bonus, BonusDirector.create_spread_shot_bonus],
+            weights=[0.4, 0.6],
+        )[0]
+
+        temp_bonus = bonus_type(0, 0)
+
+        if not temp_bonus.one_off_use and not temp_bonus._Bonus__is_reusable:
+            return
+
+        x = random.randint(100, self.width - 100)
+        y = 0
+
+        bonus = bonus_type(x, y)
+        self.bonus.add(bonus)

@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from classes.bullet import Bullet
+from classes.flight_entity import FlightEntity
 
 
 # Class representing a classic enemy who moves horizontaly and falls down every time it reaches an edge
@@ -59,7 +59,7 @@ class Enemy(pygame.sprite.Sprite):
 
         current_time = pygame.time.get_ticks()
         if current_time - self.last_shot_time > self.shoot_timer:
-            bullet = Bullet(
+            bullet = FlightEntity(
                 self.rect.centerx, self.rect.bottom, "src/assets/enemy_bullet.png", vy=5
             )
             bullet_group.add(bullet)
