@@ -81,8 +81,9 @@ class Player(pg.sprite.Sprite):
         bonus.durability -= 1
 
     def shield(self, *args, **kwargs):
-        bonus = kwargs.get("bonus", None)
-        bonus.start_time = time.time()
+        if not self.almighty:
+            bonus = kwargs.get("bonus", None)
+            bonus.start_time = time.time()
 
     def add_score(self, score):
         self.score += score
@@ -91,8 +92,6 @@ class Player(pg.sprite.Sprite):
     # before decrease we have to verify than the
     def player_hit(self, dammage):
         self.lives -= dammage
-        if self.lives <= 0:
-            self.game.quit()
 
     # Display function
     def update_bonus(self, screen):
