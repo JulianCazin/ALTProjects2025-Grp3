@@ -2,6 +2,7 @@ import pygame
 import random
 
 from classes.flight_entity import FlightEntity
+from classes.effects import EffectsManager
 
 
 # Class representing a classic enemy who moves horizontaly and falls down every time it reaches an edge
@@ -11,6 +12,7 @@ class Enemy(pygame.sprite.Sprite):
 
         super().__init__()
         # Load alien sprite
+        self.effects = EffectsManager()
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
@@ -23,6 +25,10 @@ class Enemy(pygame.sprite.Sprite):
         # Timer for random shoots
         self.shoot_timer = random.randint(1000, 4000)  # in milliseconds
         self.last_shot_time = pygame.time.get_ticks()
+
+    def enemy_hit(self, damage):
+        self.effects.play_explosion()  # play explosion sound
+        self.kill()
 
     def move(self, screen_width):
         """Move enemy horizontaly"""
@@ -68,7 +74,15 @@ class BossEnemy(Enemy):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.health = 20  # Boss has more health
+        self.health = 5  # Boss has more health
+
+
+    def enemy_hit(self, damage):
+        self.effects.play_explosion()  # play explosion sound
+        self.health-= damage
+        if self.health <= 0:
+            self.kill()
+
 
     def shoot(self, bullet_group, bullet_img="src/assets/enemy_bullet.png"):
         """Make the boss shooting in blast mode"""

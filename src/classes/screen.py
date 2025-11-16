@@ -151,9 +151,9 @@ class GameScreen(Screen):
                     self.player.consum_bonus(self.bullets)
 
     def generate_ennemies(self, wave):
-        # Ennemis
+        """Generate the enemys & boss every 3 waves"""
         boss_wave = wave % 3 == 0
-        if boss_wave or True:
+        if boss_wave:
             self.generate_boss()
         for row in range(4):
             enemy_img = random.choice(ENEMY_IMG)
@@ -165,6 +165,7 @@ class GameScreen(Screen):
         self.enemy_direction = 1
 
     def generate_boss(self):
+        """Generate the boss object & add him to corresponding groups"""
         boss = BossEnemy(
             x=self.width // 2 - 100,
             y=50,
@@ -214,20 +215,23 @@ class GameScreen(Screen):
 
         self.enemy_bullets.update()
 
-        # Collisions
-        hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
+        # Collisions enemy / bullets
+        hits = pg.sprite.groupcollide(self.enemies, self.bullets, dokilla=False, dokillb=True) 
+
         if hits:
-            self.effects.play_explosion()  # play explosion sound
-            for enemy in hits:
-                self.effects.explosion(enemy.rect.centerx, enemy.rect.centery)
+            for enemys in hits:
+                enemys.enemy_hit(1)
+                self.effects.explosion(enemys.rect.centerx, enemys.rect.centery)
             self.player.add_score(len(hits) * 10)
 
+        # Collisions enemy / player
         if (
             pg.sprite.spritecollideany(self.player, self.enemies)
             and not self.player.almighty
         ):
             self.player.player_hit(1)
 
+        # Collisions player / enemy bullets
         enemy_hits = pg.sprite.spritecollide(
             self.player, self.enemy_bullets, dokill=True
         )
