@@ -5,7 +5,7 @@ import pygame as pg
 
 from classes.player import Player
 from classes.flight_entity import BonusDirector, FlightEntity
-from classes.enemy import Enemy
+from classes.enemy import Enemy, BossEnemy
 from classes.effects import EffectsManager
 
 
@@ -107,6 +107,7 @@ class GameScreen(Screen):
         self.enemy_bullets = pg.sprite.Group()
         self.effects = EffectsManager()
         self.bonus = pg.sprite.Group()
+        self.wave = 1
 
         # Joueur
         self.player = Player(
@@ -136,7 +137,7 @@ class GameScreen(Screen):
         )
         self.is_game_over = False
 
-        self.generate_ennemies()
+        self.generate_ennemies(self.wave)
 
         self.font_score = pg.font.Font(FONT, 36)
         self.font_lives = pg.font.Font(FONT, 36)
@@ -149,8 +150,11 @@ class GameScreen(Screen):
                 if event.key == pg.K_LALT:
                     self.player.consum_bonus(self.bullets)
 
-    def generate_ennemies(self):
-        # Ennemis
+    def generate_ennemies(self, wave):
+        """Generate the enemys & boss every 3 waves"""
+        boss_wave = wave % 3 == 0
+        if boss_wave:
+            self.generate_boss()
         for row in range(4):
             enemy_img = random.choice(ENEMY_IMG)
             for col in range(8):
@@ -161,12 +165,12 @@ class GameScreen(Screen):
         self.enemy_direction = 1
 
     def generate_boss(self):
-        boss = Enemy(
+        """Generate the boss object & add him to corresponding groups"""
+        boss = BossEnemy(
             x=self.width // 2 - 100,
             y=50,
             image_path="src/assets/boss.png",
             speed=2,
-            boss=True,
         )
         self.enemies.add(boss)
         self.all_sprites.add(boss)
@@ -187,7 +191,7 @@ class GameScreen(Screen):
             self.wave_text.update()
             if pg.time.get_ticks() - self.next_wave_start_time > self.wait_duration:
                 self.waiting_next_wave = False
-                self.generate_ennemies()
+                self.generate_ennemies(wave=self.wave)
             return
 
         self.player.update(self.width)
@@ -211,20 +215,23 @@ class GameScreen(Screen):
 
         self.enemy_bullets.update()
 
-        # Collisions
-        hits = pg.sprite.groupcollide(self.enemies, self.bullets, True, True)
+        # Collisions enemy / bullets
+        hits = pg.sprite.groupcollide(self.enemies, self.bullets, dokilla=False, dokillb=True) 
+
         if hits:
-            self.effects.play_explosion()  # play explosion sound
-            for enemy in hits:
-                self.effects.explosion(enemy.rect.centerx, enemy.rect.centery)
+            for enemys in hits:
+                enemys.enemy_hit(1)
+                self.effects.explosion(enemys.rect.centerx, enemys.rect.centery)
             self.player.add_score(len(hits) * 10)
 
+        # Collisions enemy / player
         if (
             pg.sprite.spritecollideany(self.player, self.enemies)
             and not self.player.almighty
         ):
             self.player.player_hit(1)
 
+        # Collisions player / enemy bullets
         enemy_hits = pg.sprite.spritecollide(
             self.player, self.enemy_bullets, dokill=True
         )
@@ -237,6 +244,7 @@ class GameScreen(Screen):
         if len(self.enemies) == 0 and not self.waiting_next_wave:
             if self.player.lives < 5:
                 self.player.lives += 1  # give a bonus life
+            self.wave += 1
             self.waiting_next_wave = True
             self.effects.play_wave_clear()  # play wave clear sound
             self.next_wave_start_time = pg.time.get_ticks()
