@@ -1,10 +1,10 @@
 import time
 import pygame as pg
 
-from classes.flight_entity import Bonus, FlightEntity
+from src.classes.flight_entity import Bonus, FlightEntity
+from src.classes.effects import EffectsManager
 
 MAX_BONUS_INVENTORY = 3
-from classes.effects import EffectsManager
 
 
 class Player(pg.sprite.Sprite):

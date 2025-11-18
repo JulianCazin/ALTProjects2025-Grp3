@@ -1,6 +1,6 @@
 import sys
-from classes.button import BlinkingText
-from classes.screen import MenuScreen
+from src.classes.button import BlinkingText
+from src.classes.screen import MenuScreen
 import pygame as pg
 
 WIDTH, HEIGHT = 960, 540
