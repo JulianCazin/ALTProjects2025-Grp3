@@ -57,7 +57,7 @@ class Player(pg.sprite.Sprite):
         - middle → straight line
         - right → diagonal up-right
         """
-        from classes.screen import BULLET_IMG
+        from src.classes.screen import BULLET_IMG
 
         bullet_group = kwargs.get("bullet_group", None)
         bonus = kwargs.get("bonus", None)
