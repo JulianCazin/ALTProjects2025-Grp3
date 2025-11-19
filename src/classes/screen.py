@@ -23,6 +23,7 @@ FONT = "src/assets/font/space_zinzins.ttf"
 
 class Screen:
     def __init__(self, game):
+        """Create the basic screen"""
         self.game = game
 
         self.background = pg.image.load("src/assets/background.png")
@@ -39,11 +40,13 @@ class Screen:
         pass
 
     def draw(self, surface):
+        "Put elements on the screen"
         surface.blit(self.background, self.background.get_rect())
 
 
 class MenuScreen(Screen):
     def __init__(self, game):
+        """Create the menu's screen"""
         super().__init__(game)
         button_width = 350
         button_height = 60
@@ -77,13 +80,16 @@ class MenuScreen(Screen):
         self.buttons = [self.start_button, self.quit_button]
 
     def start_game(self):
+        """Launch the game"""
         self.game.set_screen(GameScreen(self.game))
 
     def update(self, dt):
+        """Actions to do when an update occured"""
         for button in self.buttons:
             button.process()
 
     def draw(self, surface):
+        """Put elements on the screen"""
         super().draw(surface)
         title = self.title_font.render("Space Zinzins", True, (255, 255, 255))
 
@@ -98,7 +104,7 @@ class MenuScreen(Screen):
 
 class GameScreen(Screen):
     def __init__(self, game):
-
+        """Create the game's screen"""
         super().__init__(game)
 
         self.all_sprites = pg.sprite.Group()
@@ -109,7 +115,7 @@ class GameScreen(Screen):
         self.bonus = pg.sprite.Group()
         self.wave = 1
 
-        # Joueur
+        # Player
         self.player = Player(
             x=self.width // 2,
             y=self.height - 50,
@@ -123,14 +129,14 @@ class GameScreen(Screen):
         self.wait_duration = 2000  # in ms (2 secondes)
         self.wave_text = BlinkingText(
             "NEXT WAVE",
-            "src/assets/font/space_zinzins.ttf",
+            FONT,
             72,
             (self.width // 2, self.height // 2),
             blink_interval=400,
         )
         self.game_over_text = BlinkingText(
             "GAME OVER",
-            "src/assets/font/space_zinzins.ttf",
+            FONT,
             72,
             (self.width // 2, self.height // 2),
             blink_interval=600,
@@ -143,6 +149,7 @@ class GameScreen(Screen):
         self.font_lives = pg.font.Font(FONT, 36)
 
     def handle_events(self, events):
+        "Handle events that could occurs in the screen"
         for event in events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
@@ -176,6 +183,7 @@ class GameScreen(Screen):
         self.all_sprites.add(boss)
 
     def clear_sprites(self):
+        """Clear all sprites of the screen"""
         self.bullets.empty()
         self.enemy_bullets.empty()
         self.enemies.empty()
@@ -183,6 +191,7 @@ class GameScreen(Screen):
         self.all_sprites.add(self.player)
 
     def update(self, dt):
+        """Actions to do when an update occured"""
         if self.is_game_over:
             return
 
@@ -203,6 +212,8 @@ class GameScreen(Screen):
         self.effects.update()
 
         edge_reached = False
+
+        # Enemies
         for enemy in self.enemies:
             if enemy.update(self.width):
                 edge_reached = True
@@ -259,6 +270,7 @@ class GameScreen(Screen):
             self.is_game_over = True
 
     def draw(self, surface):
+        """Put elements on the screen"""
         super().draw(surface)
         self.all_sprites.draw(surface)
         self.bullets.draw(surface)
@@ -300,9 +312,9 @@ class GameScreen(Screen):
             weights=[0.4, 0.6],
         )[0]
 
-        temp_bonus = bonus_type(0, 0)
+        time_bonus = bonus_type(0, 0)
 
-        if not temp_bonus.one_off_use and not temp_bonus._Bonus__is_reusable:
+        if not time_bonus.one_off_use and not time_bonus._Bonus__is_reusable:
             return
 
         x = random.randint(100, self.width - 100)
@@ -312,6 +324,7 @@ class GameScreen(Screen):
         self.bonus.add(bonus)
 
     def game_over_modal(self, surface):
+        """Put the game over modal on the sceen"""
         height = self.game.screen.get_height()
         width = self.game.screen.get_width()
         modal = (

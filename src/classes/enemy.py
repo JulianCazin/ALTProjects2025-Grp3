@@ -28,8 +28,8 @@ class Enemy(pygame.sprite.Sprite):
         self.shoot_timer = random.randint(1000, 4000)  # in milliseconds
         self.last_shot_time = pygame.time.get_ticks()
 
-    def enemy_hit(self):
-        """Actions when an enemy is hit"""
+    def enemy_hit(self, damage):
+        """Actions when an enemy is hit. Default enemy dies on first hit"""
         self.effects.play_explosion()  # play explosion sound
         self.kill()
 
