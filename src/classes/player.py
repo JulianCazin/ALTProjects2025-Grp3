@@ -2,14 +2,14 @@ import time
 import pygame as pg
 
 from classes.flight_entity import Bonus, FlightEntity
-
-MAX_BONUS_INVENTORY = 3
 from classes.effects import EffectsManager
 
+MAX_BONUS_INVENTORY = 3
 
 class Player(pg.sprite.Sprite):
 
-    def __init__(self, x, y, speed, image_path):
+    def __init__(self, x, y, image_path, speed):
+        """Create the player with its x and y coordonates, its sprite and its speed"""
         super().__init__()
         self.BONUS_MAPPING = {
             Bonus.SPREAD_SHOT: self.shoot_spread,
@@ -81,16 +81,19 @@ class Player(pg.sprite.Sprite):
         bonus.durability -= 1
 
     def shield(self, *args, **kwargs):
+        """Handle the shield bonus"""
         if not self.almighty:
             bonus = kwargs.get("bonus", None)
             bonus.start_time = time.time()
 
     def add_score(self, score):
+        """Add score to the total score"""
         self.score += score
 
-    # decrease the life's number of the player when he is hit by an ennemi
+    # decrease the life's number of the player when he is hit by an enemy
     # before decrease we have to verify than the
     def player_hit(self, dammage):
+        """Actions when the player is hit"""
         self.lives -= dammage
 
     # Display function
@@ -128,11 +131,13 @@ class Player(pg.sprite.Sprite):
                 current_bonus.kill()
 
     def collect_bonus(self, bonus):
+        """Actions when the player touches a bonus"""
         self.score += bonus.point
         if len(self.bonus) < MAX_BONUS_INVENTORY:
             self.bonus.append(bonus)
 
     def consum_bonus(self, bullet_group):
+        """Actions when the player uses a bonus"""
         if len(self.bonus) > 0:
             current_bonus = self.bonus[0]
             if current_bonus.durability > 0:

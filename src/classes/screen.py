@@ -119,8 +119,8 @@ class GameScreen(Screen):
         self.player = Player(
             x=self.width // 2,
             y=self.height - 50,
-            speed=5,
             image_path=PLAYER_IMG,
+            speed=5,
         )
         self.all_sprites.add(self.player)
 
