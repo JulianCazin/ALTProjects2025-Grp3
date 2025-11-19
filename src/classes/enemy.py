@@ -9,6 +9,8 @@ from classes.effects import EffectsManager
 class Enemy(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image_path, speed=3):
+        """Create an enemy with its x and y coordonates, its sprite and its speed.
+        By default the speed is at 3"""
 
         super().__init__()
         # Load alien sprite
@@ -26,7 +28,8 @@ class Enemy(pygame.sprite.Sprite):
         self.shoot_timer = random.randint(1000, 4000)  # in milliseconds
         self.last_shot_time = pygame.time.get_ticks()
 
-    def enemy_hit(self, damage):
+    def enemy_hit(self):
+        """Actions when an enemy is hit"""
         self.effects.play_explosion()  # play explosion sound
         self.kill()
 
@@ -69,6 +72,8 @@ class Enemy(pygame.sprite.Sprite):
 
 class BossEnemy(Enemy):
     def __init__(self, x, y, image_path, speed=2):
+        """Create a boss with its x and y coordonates, its sprite and its speed.
+        By default its speed is at 2"""
         super().__init__(x, y, image_path, speed)
         self.image = pygame.transform.scale(self.image, (120, 120))
         self.rect = self.image.get_rect()
@@ -78,6 +83,7 @@ class BossEnemy(Enemy):
 
 
     def enemy_hit(self, damage):
+        """Action when the boss is hit"""
         self.effects.play_explosion()  # play explosion sound
         self.health-= damage
         if self.health <= 0:
