@@ -10,6 +10,7 @@ BG_COLOR = (18, 18, 20)
 
 class Game:
     def __init__(self):
+        """Create the game"""
         pg.init()
         pg.display.set_caption("Space Zinzins")
 
@@ -20,9 +21,11 @@ class Game:
         self.current_screen = MenuScreen(self)
 
     def set_screen(self, screen):
+        """Set the current screen"""
         self.current_screen = screen
 
     def run(self):
+        """Run the game"""
         while self.running:
             dt = self.clock.tick(FPS) / 1000.0
             events = pg.event.get()
@@ -39,6 +42,7 @@ class Game:
         self.quit()
 
     def quit(self):
+        """Quit the game"""
         pg.quit()
         sys.exit()
 
