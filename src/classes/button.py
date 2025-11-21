@@ -19,6 +19,10 @@ class Button:
         border_color=(0, 0, 0),
         border_width=0,  # <-- 0 = no border
     ):
+        """Create a button. It has x and y coordonates, a width and a height. 
+        A text that by default is 'Button'. A text color, a function on press, a color,
+        a hover color, a pressed color, a border radius, a border color and a border width.
+        A border width of 0 gives no border to the button"""
         self.x = x
         self.y = y
         self.width = width
@@ -40,6 +44,7 @@ class Button:
         self.button_surf = self.font.render(button_text, True, self.text_color)
 
     def process(self):
+        """Handle the events of the button"""
         mousePos = pg.mouse.get_pos()
         color = self.color
 
@@ -91,6 +96,7 @@ class BlinkingText:
     def __init__(
         self, text, font_path, size, pos, color=(255, 255, 255), blink_interval=500
     ):
+        """Create a blinking text. Used for announcing a new wave"""
         self.font = pg.font.Font(font_path, size)
         self.text_surface = self.font.render(text, True, color)
         self.rect = self.text_surface.get_rect(center=pos)
@@ -111,6 +117,7 @@ class BlinkingText:
 
 class Modal:
     def __init__(self, height, width, x=0, y=0):
+        """Create a modal. Used for the game over"""
         self.surface = pg.Surface((width, height), pg.SRCALPHA)
         self.rect = pg.Rect(x, y, width, height)
         self.background_color = (0, 0, 0)
@@ -118,18 +125,22 @@ class Modal:
         self.border_radius = 0
 
     def set_background_color(self, color):
+        """Set the background color of the modal"""
         self.background_color = color
         return self
 
     def set_opacity(self, opacity):
+        """Set the opacity of the modal"""
         self.opacity = opacity
         return self
 
     def set_border_radius(self, radius):
+        """Set the border radius of the modal"""
         self.border_radius = radius
         return self
 
     def draw(self, surface):
+        """Render the modal"""
         self.surface.fill((0, 0, 0, 0))  # clear old content
         self.surface.set_alpha(self.opacity)
         pg.draw.rect(
