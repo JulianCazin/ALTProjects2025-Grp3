@@ -9,6 +9,8 @@ from src.classes.effects import EffectsManager
 class Enemy(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image_path, speed=3):
+        """Create an enemy with its x and y coordonates, its sprite and its speed.
+        By default the speed is at 3"""
 
         super().__init__()
         # Load alien sprite
@@ -79,6 +81,8 @@ class Enemy(pygame.sprite.Sprite):
 # Class for the boss, overright method to match boss
 class BossEnemy(Enemy):
     def __init__(self, x, y, image_path, speed=2):
+        """Create a boss with its x and y coordonates, its sprite and its speed.
+        By default its speed is at 2"""
         super().__init__(x, y, image_path, speed)
         self.image = pygame.transform.scale(self.image, (120, 120))
         self.rect = self.image.get_rect()

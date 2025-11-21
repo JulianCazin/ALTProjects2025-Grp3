@@ -4,6 +4,7 @@ import random
 
 class EffectsManager:
     def __init__(self):
+        """Create an effect"""
         # load sounds
         self.snd_shoot = pygame.mixer.Sound("src/assets/sounds/shoot.wav")
         self.snd_explosion = pygame.mixer.Sound("src/assets/sounds/explosion.wav")
@@ -19,7 +20,7 @@ class EffectsManager:
 
     # === VISUAL EFFETS  ===
     def explosion(self, x, y, color=(164, 185, 7)):
-        """Crée une petite explosion de particules"""
+        """Create a small explosion of particles"""
         for _ in range(10):
             particle = Particle(x, y, color)
             self.particles.add(particle)
@@ -27,47 +28,59 @@ class EffectsManager:
 
     # === SOUND EFFECTS ===
     def play_shoot(self):
+        """Play the sound of a shoot"""
         self.snd_shoot.play()
 
     def play_explosion(self):
+        """Play the sound of an explosion"""
         self.snd_explosion.play()
 
     def play_hit(self):
+        """Play the sound of a hit"""
         self.snd_hit.play()
 
     def play_gameover(self):
+        """Play the sound of a gameover"""
         self.snd_gameover.play()
 
     def play_wave_clear(self):
+        """Play the sound of a cleared wave"""
         self.snd_wave_clear.play()
 
     def play_boss_spawn(self):
+        """Play the sound of a boss spawning"""
         self.snd_boss_spawn.play()
 
     def play_boss_dead(self):
+        """Play the sound of a dead boss"""
         self.snd_boss_dead.play()
 
     # === UPDATE ===
     def update(self):
+        """Update the particles"""
         self.particles.update()
 
     def draw(self, screen):
+        """Render the particles"""
         self.particles.draw(screen)
 
 
 class Particle(pygame.sprite.Sprite):
-    """Simple animated particle (explosion, shot, etc.)"""
+    """Simple animated particles (explosion, shot, etc.)"""
 
     def __init__(self, x, y, color):
+        """Create a particle with its x and y coordonates and its color"""
         super().__init__()
         self.image = pygame.Surface((4, 4))
         self.image.fill(color)
         self.rect = self.image.get_rect(center=(x, y))
+        # Create the randomness of the particle
         self.vx = random.uniform(-2, 2)
         self.vy = random.uniform(-2, 2)
         self.life = random.randint(20, 40)
 
     def update(self):
+        """Actions when the particle is updated"""
         self.rect.x += self.vx
         self.rect.y += self.vy
         self.life -= 1
