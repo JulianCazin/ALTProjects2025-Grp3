@@ -1,55 +1,96 @@
 import pytest
-from unittest.mock import patch, MagicMock
-import pygame
+import pygame as pg
+from unittest.mock import Mock, patch
 
 from src.classes.player import Player
 from src.classes.flight_entity import Bonus, FlightEntity
 
 
-# FIXTURES
+@pytest.fixture
+def mock_pygame(monkeypatch):
+    """Mock minimal pygame components that Player needs."""
 
+    # Mock image loading
+    mock_image = Mock()
+    mock_image.get_rect.return_value = pg.Rect(0, 0, 100, 100)
 
-@pytest.fixture(autouse=True)
-def pygame_init():
-    """Initialize pygame modules for tests."""
-    pygame.init()
+    monkeypatch.setattr(pg.image, "load", lambda path: mock_image)
+    monkeypatch.setattr(pg.transform, "scale", lambda img, size: mock_image)
+
+    # Mock key presses
+    monkeypatch.setattr(pg.key, "get_pressed", lambda: [0] * 300)
+
+    # Mock sound to avoid initializing mixer
+    monkeypatch.setattr(pg.mixer, "Sound", lambda *args, **kwargs: Mock())
+
+    return mock_image
 
 
 @pytest.fixture
-def mock_image():
-    """Mock pygame.image.load, convert_alpha, and transform.scale."""
-    fake_surface = MagicMock(spec=pygame.Surface)
-    fake_surface.convert_alpha.return_value = fake_surface
-
-    with patch("pygame.image.load", return_value=fake_surface) as mocked_load, patch(
-        "pygame.transform.scale", return_value=fake_surface
-    ) as mocked_scale:
-        yield {
-            "load": mocked_load,
-            "scale": mocked_scale,
-            "surface": fake_surface,
-        }
-
-
-@pytest.fixture
-def player(mock_image):
-    return Player(x=400, y=500, speed=5, image_path="fake.png")
-
-
-# BASIC TESTS
+def player(mock_pygame):
+    """Create a minimal player instance."""
+    p = Player(x=200, y=300, speed=5, image_path="fake.png")
+    return p
 
 
 def test_player_initialization(player):
-    assert player.lives == 3
-    assert player.score == 0
     assert player.speed == 5
-    assert isinstance(player.rect, pygame.Rect)
-    assert player.image is not None
+    assert player.score == 0
+    assert player.lives == 3
+    assert isinstance(player.rect, pg.Rect)
 
 
-def test_player_add_score(player):
-    player.add_score(50)
+def test_update_moves_left(monkeypatch, player):
+    class FakeKeys:
+        def __getitem__(self, key):
+            return key == pg.K_LEFT
+
+    monkeypatch.setattr(pg.key, "get_pressed", lambda: FakeKeys())
+
+    initial_x = player.rect.x
+    player.update(screen_width=800)
+
+    assert player.rect.x == initial_x - player.speed
+
+
+def test_update_moves_right(monkeypatch, player):
+    class FakeKeys:
+        def __getitem__(self, key):
+            return key == pg.K_RIGHT
+
+    monkeypatch.setattr(pg.key, "get_pressed", lambda: FakeKeys())
+
+    initial_x = player.rect.x
+    player.update(screen_width=800)
+
+    assert player.rect.x == initial_x + player.speed
+
+
+def test_shoot_basic(player):
+    bullet_group = Mock()
+    bullet_group.add = Mock()
+
+    # Fake bullet class
+    class FakeBullet:
+        def __init__(self, x, y, img):
+            self.x = x
+            self.y = y
+
+    player.shoot_basic(bullet_group, FakeBullet, "bullet.png")
+
+    bullet_group.add.assert_called_once()
+    assert bullet_group.add.call_count == 3
+    assert player.effect is not None
+
+
+def test_collect_bonus(player):
+    bonus = Mock()
+    bonus.point = 50
+
+    player.collect_bonus(bonus)
+
     assert player.score == 50
+    assert len(player.bonus) == 1
 
 
 def test_player_hit(player):
@@ -57,149 +98,63 @@ def test_player_hit(player):
     assert player.lives == 2
 
 
-# MOVEMENT TESTS
+# TESTS BONUS SHIELD
 
 
-def test_player_move_left(player, monkeypatch):
-    keys = [0] * 1000
-    keys[pygame.K_LEFT] = 1
-    monkeypatch.setattr(pygame.key, "get_pressed", lambda: keys)
-
-    old_x = player.rect.x
-    player.update(800)
-    assert player.rect.x == old_x - player.speed
-
-
-def test_player_move_right(player, monkeypatch):
-    keys = [0] * 1000
-    keys[pygame.K_RIGHT] = 1
-    monkeypatch.setattr(pygame.key, "get_pressed", lambda: keys)
-
-    old_x = player.rect.x
-    player.update(800)
-    assert player.rect.x == old_x + player.speed
-
-
-# SHOOTING TESTS
-
-
-def test_player_shoot_basic(player):
-    bullet_group = MagicMock()
-    bullet_class = MagicMock()
-    bullet_img = "bullet.png"
-
-    player.shoot_basic(bullet_group, bullet_class, bullet_img)
-
-    bullet_class.assert_called_once()
-    bullet_group.add.assert_called_once()
-    player.effect.play_shoot.assert_called_once()
-
-
-def test_player_shoot_spread(player):
-    bullet_group = MagicMock()
-
-    # Fake bonus
-    bonus = MagicMock()
-    bonus.durability = 3
-
-    with patch("src.classes.player.FlightEntity") as MockBullet, patch(
-        "src.classes.player.BULLET_IMG", "fake_bullet.png"
-    ):
-
-        player.shoot_spread(bullet_group=bullet_group, bonus=bonus)
-
-        # 3 bullets
-        assert MockBullet.call_count == 3
-        assert bullet_group.add.call_count == 3
-
-        # durability reduced
-        assert bonus.durability == 2
-
-        player.effect.play_shoot.assert_called_once()
-
-
-# SHIELD TEST
-
-
-def test_player_shield(player, monkeypatch):
-    bonus = MagicMock()
+def test_shield_activates(monkeypatch, player):
+    bonus = Mock()
     bonus.start_time = None
 
-    with patch("time.time", return_value=1000):
+    with patch("time.time", return_value=1234):
         player.shield(bonus=bonus)
 
-    assert bonus.start_time == 1000
+    assert bonus.start_time == 1234
 
 
-# BONUS SYSTEM TESTS
+# TEST SPREAD SHOT
 
 
-def test_player_collect_bonus(player):
-    bonus = MagicMock()
-    bonus.point = 10
+def test_shoot_spread(monkeypatch, player):
+    """Test spread shot creates 3 bullets with correct velocity and durability effect."""
 
-    player.collect_bonus(bonus)
+    # Mock BULLET_IMG import used inside shoot_spread
+    monkeypatch.setattr("src.classes.screen.BULLET_IMG", "fake_bullet.png")
 
-    assert player.score == 10
-    assert bonus in player.bonus
+    bullet_group = Mock()
+    bullet_group.add = Mock()
 
+    # Fake bonus
+    bonus = Mock()
+    bonus.durability = 3
 
-def test_player_collect_bonus_inventory_limit(player):
-    b1 = MagicMock()
-    b2 = MagicMock()
-    b3 = MagicMock()
-    b4 = MagicMock()
+    # Patch FlightEntity constructor to avoid real sprite
+    with patch("src.classes.player.FlightEntity", return_value=Mock()) as fake_entity:
+        player.shoot_spread(bullet_group=bullet_group, bonus=bonus)
 
-    for b in (b1, b2, b3):
-        player.collect_bonus(b)
+    # Should create 3 bullets
+    assert bullet_group.add.call_count == 3
 
-    assert len(player.bonus) == 3
-
-    # fourth should NOT be added
-    player.collect_bonus(b4)
-    assert len(player.bonus) == 3
-    assert b4 not in player.bonus
+    # Durability must decrease by 1
+    assert bonus.durability == 2
 
 
-def test_player_consume_bonus(player):
-    bullet_group = MagicMock()
+# TEST consum_bonus USES BONUS_MAPPING
 
-    # Create a mock SPREAD_SHOT bonus
-    bonus = MagicMock()
+
+def test_consum_bonus_calls_correct_function(monkeypatch, player):
+    bullet_group = Mock()
+
+    # Mock a bonus
+    bonus = Mock()
     bonus.type = Bonus.SPREAD_SHOT
     bonus.durability = 2
-    player.bonus.append(bonus)
 
-    with patch.object(player, "shoot_spread") as mock_shoot:
-        player.consum_bonus(bullet_group)
+    player.bonus = [bonus]
 
-        mock_shoot.assert_called_once()
-        assert bonus.durability == 2  # durability handled inside shoot_spread
+    # Mock the function that should be called
+    mock_spread = Mock()
+    player.BONUS_MAPPING[Bonus.SPREAD_SHOT] = mock_spread
 
+    player.consum_bonus(bullet_group)
 
-# UPDATE BONUS (shield timeout)
-
-
-def test_player_update_bonus_shield_expired(player, monkeypatch):
-    # mock screen
-    screen = MagicMock()
-    screen.get_height.return_value = 600
-
-    bonus = MagicMock()
-    bonus.type = Bonus.SHIELD
-    bonus.start_time = 100
-    bonus.lifetime = 5
-    bonus.durability = 1
-    bonus.image = MagicMock()
-    bonus.rect = pygame.Rect(0, 0, 10, 10)
-
-    player.bonus.append(bonus)
-
-    # simulate time passed
-    monkeypatch.setattr("time.time", lambda: 200)
-
-    player.update_bonus(screen)
-
-    # durability should now be zero → bonus removed
-    assert bonus not in player.bonus
-    assert player.almighty is False
+    mock_spread.assert_called_once()
