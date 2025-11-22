@@ -179,6 +179,7 @@ class GameScreen(Screen):
             image_path="src/assets/boss.png",
             speed=2,
         )
+        self.effects.play_boss_spawn()
         self.enemies.add(boss)
         self.all_sprites.add(boss)
 
@@ -227,7 +228,9 @@ class GameScreen(Screen):
         self.enemy_bullets.update()
 
         # Collisions enemy / bullets
-        hits = pg.sprite.groupcollide(self.enemies, self.bullets, dokilla=False, dokillb=True) 
+        hits = pg.sprite.groupcollide(
+            self.enemies, self.bullets, dokilla=False, dokillb=True
+        )
 
         if hits:
             for enemys in hits:
@@ -267,6 +270,7 @@ class GameScreen(Screen):
             bonus_hits[0].getting_collected()
 
         if self.player.lives <= 0:
+            self.effects.play_gameover()  # play game over sound
             self.is_game_over = True
 
     def draw(self, surface):
