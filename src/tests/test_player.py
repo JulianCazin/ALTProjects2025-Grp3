@@ -79,7 +79,7 @@ def test_shoot_basic(player):
     player.shoot_basic(bullet_group, FakeBullet, "bullet.png")
 
     bullet_group.add.assert_called_once()
-    assert bullet_group.add.call_count == 3
+    assert bullet_group.add.call_count == 1
     assert player.effect is not None
 
 
