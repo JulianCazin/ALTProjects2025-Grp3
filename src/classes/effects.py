@@ -19,11 +19,9 @@ class EffectsManager:
         self.snd_boss_spawn = pygame.mixer.Sound("src/assets/sounds/boss_spawn.wav")
         self.snd_boss_dead = pygame.mixer.Sound("src/assets/sounds/boss_dead.wav")
 
-        self.snd_explosion.set_volume(0.2)
-
         # === LOAD BACKGROUND MUSIC AS SOUND (NOT mixer.music) ===
         self.music = pygame.mixer.Sound("src/assets/sounds/sound_theme.wav")
-        self.music.set_volume(0.4)
+        self.music.set_volume(0.3)
 
         # Start the music immediately
         self.music_channel.play(self.music, loops=-1)
