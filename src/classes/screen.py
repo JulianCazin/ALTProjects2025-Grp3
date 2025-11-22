@@ -114,6 +114,8 @@ class GameScreen(Screen):
         self.bonus = pg.sprite.Group()
         self.wave = 1
 
+        self.effects.play_music()
+
         # Player
         self.player = Player(
             x=self.width // 2,
@@ -178,6 +180,7 @@ class GameScreen(Screen):
             image_path="src/assets/boss.png",
             speed=2,
         )
+        self.effects.play_boss_spawn()
         self.enemies.add(boss)
         self.all_sprites.add(boss)
 
@@ -269,6 +272,8 @@ class GameScreen(Screen):
             bonus_hits[0].getting_collected()
 
         if self.player.lives <= 0:
+            self.effects.play_gameover()  # play game over sound
+            self.effects.stop_music()
             self.is_game_over = True
 
     def draw(self, surface):

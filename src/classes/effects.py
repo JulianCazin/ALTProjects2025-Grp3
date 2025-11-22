@@ -16,7 +16,10 @@ class EffectsManager:
 
         self.particles = pygame.sprite.Group()
 
-        self.snd_explosion.set_volume(0.2)
+        # === LOAD BACKGROUND MUSIC ===
+        pygame.mixer.music.load("src/assets/sounds/sound_theme.wav")
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play(-1)  # play in loop
 
     # === VISUAL EFFETS  ===
     def explosion(self, x, y, color=(164, 185, 7)):
@@ -54,6 +57,16 @@ class EffectsManager:
     def play_boss_dead(self):
         """Play the sound of a dead boss"""
         self.snd_boss_dead.play()
+
+    # === BACKGROUND MUSIC ===
+    def play_music(self, loop=True):
+        """Play background music (loop = True means infinite loop)."""
+        loops = -1 if loop else 0
+        pygame.mixer.music.play(loops)
+
+    def stop_music(self):
+        """Stop background music."""
+        pygame.mixer.music.stop()
 
     # === UPDATE ===
     def update(self):

@@ -89,6 +89,17 @@ class BossEnemy(Enemy):
         self.rect.x = x
         self.rect.y = y
         self.health = 5  # Boss has more health
+     
+    # Override enemy_hit to make a special effect when the boss die
+    def enemy_hit(self, damage):
+        """Action when the boss is hit"""
+
+        self.health -= damage
+        if self.health <= 0:
+            self.effects.play_boss_dead()  # play boss death sound
+            self.kill()
+        else:
+            self.effects.play_explosion()  # play explosion sound
 
     # Override shoot to make it 3 bullets
     def shoot(self, bullet_group, bullet_img="src/assets/enemy_bullet.png"):
