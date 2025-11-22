@@ -1,8 +1,10 @@
 import time
 import pygame as pg
 
-from classes.flight_entity import Bonus, FlightEntity
-from classes.effects import EffectsManager
+from src.classes.flight_entity import Bonus, FlightEntity
+from src.classes.effects import EffectsManager
+
+MAX_BONUS_INVENTORY = 3
 
 MAX_BONUS_INVENTORY = 3
 
@@ -57,7 +59,7 @@ class Player(pg.sprite.Sprite):
         - middle → straight line
         - right → diagonal up-right
         """
-        from classes.screen import BULLET_IMG
+        from src.classes.screen import BULLET_IMG
 
         bullet_group = kwargs.get("bullet_group", None)
         bonus = kwargs.get("bonus", None)

@@ -1,8 +1,8 @@
 import pygame
 import random
 
-from classes.flight_entity import FlightEntity
-from classes.effects import EffectsManager
+from src.classes.flight_entity import FlightEntity
+from src.classes.effects import EffectsManager
 
 
 # Class representing a classic enemy who moves horizontaly and falls down every time it reaches an edge
@@ -21,6 +21,9 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+        # In case we decide to make enemys stronger (exemple : health = 2)
+        self.health = 1
+
         # Horizontal speed
         self.speed = speed
 
@@ -29,12 +32,16 @@ class Enemy(pygame.sprite.Sprite):
         self.last_shot_time = pygame.time.get_ticks()
 
     def enemy_hit(self, damage):
-        """Actions when an enemy is hit. Default enemy dies on first hit"""
-        self.effects.play_explosion()  # play explosion sound
-        self.kill()
+        """Apply damage to the enemy. Returns True if the enemy died."""
+        self.health -= damage
+        if self.health <= 0:
+            self.effects.play_explosion()
+            self.kill()
+            return True
+        return False
 
     def move(self, screen_width):
-        """Move enemy horizontaly"""
+        """Move enemy horizontaly & return if edge is reached"""
         self.rect.x += self.speed
 
         # If we reach an edge, return true (signal to lower the wave)
@@ -66,10 +73,12 @@ class Enemy(pygame.sprite.Sprite):
             self.shoot_timer = random.randint(3000, 8000)  # 3s to 8s between shoot
 
     def update(self, screen_width):
+        """update method of the enemy object"""
         edge_reached = self.move(screen_width)
         return edge_reached
 
 
+# Class for the boss, overright method to match boss
 class BossEnemy(Enemy):
     def __init__(self, x, y, image_path, speed=2):
         """Create a boss with its x and y coordonates, its sprite and its speed.
@@ -80,7 +89,8 @@ class BossEnemy(Enemy):
         self.rect.x = x
         self.rect.y = y
         self.health = 5  # Boss has more health
-
+     
+    # Override enemy_hit to make a special effect when the boss die
     def enemy_hit(self, damage):
         """Action when the boss is hit"""
 
@@ -91,6 +101,7 @@ class BossEnemy(Enemy):
         else:
             self.effects.play_explosion()  # play explosion sound
 
+    # Override shoot to make it 3 bullets
     def shoot(self, bullet_group, bullet_img="src/assets/enemy_bullet.png"):
         """Make the boss shooting in blast mode"""
         for offset in [-30, 0, 30]:  # three bullets: left, center, right
@@ -101,12 +112,6 @@ class BossEnemy(Enemy):
                 vy=5,
             )
             bullet_group.add(bullet)
-
-    def take_damage(self, amount):
-        """Reduce boss health by the given amount"""
-        self.health -= amount
-        if self.health <= 0:
-            self.kill()  # Remove boss from all groups
 
     # Override try_to_shoot to shoot more frequently
     def try_to_shoot(self, bullet_group):
@@ -119,7 +124,3 @@ class BossEnemy(Enemy):
             # Reset the timer with a new random duration
             self.last_shot_time = current_time
             self.shoot_timer = random.randint(800, 2000)  # 0.8s to 2s between shoot
-
-    def update(self, screen_width):
-        edge_reached = self.move(screen_width)
-        return edge_reached

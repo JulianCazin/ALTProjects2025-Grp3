@@ -3,6 +3,14 @@
 # Projet de Développement de Jeux 
 ## Langage de programmation au choix
 
+# Start up
+
+Command to start the game : 
+```
+python -m src.main
+```
+
+
 ## Introduction : 
 
 Vous êtes chargé de travailler en groupe sur un projet de développement de jeux. Les jeux disponibles pour le projet sont :

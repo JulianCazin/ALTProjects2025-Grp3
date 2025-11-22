@@ -2,7 +2,7 @@ import sys
 import logging
 import os
 
-from classes.game import Game
+from src.classes.game import Game
 
 logging.basicConfig(
     level=logging.INFO,
