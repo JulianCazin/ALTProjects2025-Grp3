@@ -5,7 +5,12 @@ import random
 class EffectsManager:
     def __init__(self):
         """Create an effect"""
-        # load sounds
+        # === PREPARE AUDIO CHANNELS ===
+        pygame.mixer.set_num_channels(8)  # plenty of space
+        self.music_channel = pygame.mixer.Channel(0)  # dedicated to music
+        self.sfx_channel = pygame.mixer.Channel(1)  # dedicated to SFX
+
+        # === LOAD SOUND EFFECTS ===
         self.snd_shoot = pygame.mixer.Sound("src/assets/sounds/shoot.wav")
         self.snd_explosion = pygame.mixer.Sound("src/assets/sounds/explosion.wav")
         self.snd_hit = pygame.mixer.Sound("src/assets/sounds/hit.wav")
@@ -14,46 +19,55 @@ class EffectsManager:
         self.snd_boss_spawn = pygame.mixer.Sound("src/assets/sounds/boss_spawn.wav")
         self.snd_boss_dead = pygame.mixer.Sound("src/assets/sounds/boss_dead.wav")
 
-        self.particles = pygame.sprite.Group()
-
         self.snd_explosion.set_volume(0.2)
 
-    # === VISUAL EFFETS  ===
+        # === LOAD BACKGROUND MUSIC AS SOUND (NOT mixer.music) ===
+        self.music = pygame.mixer.Sound("src/assets/sounds/sound_theme.wav")
+        self.music.set_volume(0.4)
+
+        # Start the music immediately
+        self.music_channel.play(self.music, loops=-1)
+
+        # Particles
+        self.particles = pygame.sprite.Group()
+
+    # === VISUAL EFFECTS ===
     def explosion(self, x, y, color=(164, 185, 7)):
         """Create a small explosion of particles"""
         for _ in range(10):
             particle = Particle(x, y, color)
             self.particles.add(particle)
-        self.snd_explosion.play()
+        self.sfx_channel.play(self.snd_explosion)
 
     # === SOUND EFFECTS ===
     def play_shoot(self):
-        """Play the sound of a shoot"""
-        self.snd_shoot.play()
+        self.sfx_channel.play(self.snd_shoot)
 
     def play_explosion(self):
-        """Play the sound of an explosion"""
-        self.snd_explosion.play()
+        self.sfx_channel.play(self.snd_explosion)
 
     def play_hit(self):
-        """Play the sound of a hit"""
-        self.snd_hit.play()
+        self.sfx_channel.play(self.snd_hit)
 
     def play_gameover(self):
-        """Play the sound of a gameover"""
-        self.snd_gameover.play()
+        self.sfx_channel.play(self.snd_gameover)
 
     def play_wave_clear(self):
-        """Play the sound of a cleared wave"""
-        self.snd_wave_clear.play()
+        self.sfx_channel.play(self.snd_wave_clear)
 
     def play_boss_spawn(self):
-        """Play the sound of a boss spawning"""
-        self.snd_boss_spawn.play()
+        self.sfx_channel.play(self.snd_boss_spawn)
 
     def play_boss_dead(self):
-        """Play the sound of a dead boss"""
-        self.snd_boss_dead.play()
+        self.sfx_channel.play(self.snd_boss_dead)
+
+    # === BACKGROUND MUSIC ===
+    def play_music(self, loop=True):
+        loops = -1 if loop else 0
+        self.music_channel.play(self.music, loops=loops)
+
+    def stop_music(self):
+        self.music_channel.stop()
 
     # === UPDATE ===
     def update(self):
@@ -69,18 +83,16 @@ class Particle(pygame.sprite.Sprite):
     """Simple animated particles (explosion, shot, etc.)"""
 
     def __init__(self, x, y, color):
-        """Create a particle with its x and y coordonates and its color"""
         super().__init__()
         self.image = pygame.Surface((4, 4))
         self.image.fill(color)
         self.rect = self.image.get_rect(center=(x, y))
-        # Create the randomness of the particle
+
         self.vx = random.uniform(-2, 2)
         self.vy = random.uniform(-2, 2)
         self.life = random.randint(20, 40)
 
     def update(self):
-        """Actions when the particle is updated"""
         self.rect.x += self.vx
         self.rect.y += self.vy
         self.life -= 1
