@@ -81,14 +81,15 @@ class BossEnemy(Enemy):
         self.rect.y = y
         self.health = 5  # Boss has more health
 
-
     def enemy_hit(self, damage):
         """Action when the boss is hit"""
-        self.effects.play_explosion()  # play explosion sound
-        self.health-= damage
-        if self.health <= 0:
-            self.kill()
 
+        self.health -= damage
+        if self.health <= 0:
+            self.effects.play_boss_dead()  # play boss death sound
+            self.kill()
+        else:
+            self.effects.play_explosion()  # play explosion sound
 
     def shoot(self, bullet_group, bullet_img="src/assets/enemy_bullet.png"):
         """Make the boss shooting in blast mode"""
