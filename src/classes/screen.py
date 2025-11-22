@@ -1,12 +1,11 @@
 import random
 from time import sleep
-from classes.button import BlinkingText, Button, Modal
 import pygame as pg
-
-from classes.player import Player
-from classes.flight_entity import BonusDirector, FlightEntity
-from classes.enemy import Enemy, BossEnemy
-from classes.effects import EffectsManager
+from src.classes.button import BlinkingText, Button, Modal
+from src.classes.player import Player
+from src.classes.flight_entity import BonusDirector, FlightEntity
+from src.classes.enemy import Enemy, BossEnemy
+from src.classes.effects import EffectsManager
 
 
 PLAYER_IMG = "src/assets/vaisseau.png"
@@ -220,6 +219,7 @@ class GameScreen(Screen):
 
             enemy.try_to_shoot(self.enemy_bullets)
 
+        # When enemy reach the edge
         if edge_reached:
             for enemy in self.enemies:
                 enemy.edge_reached()
@@ -227,7 +227,9 @@ class GameScreen(Screen):
         self.enemy_bullets.update()
 
         # Collisions enemy / bullets
-        hits = pg.sprite.groupcollide(self.enemies, self.bullets, dokilla=False, dokillb=True) 
+        hits = pg.sprite.groupcollide(
+            self.enemies, self.bullets, dokilla=False, dokillb=True
+        )
 
         if hits:
             for enemys in hits:
