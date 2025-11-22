@@ -16,6 +16,8 @@ class EffectsManager:
 
         self.particles = pygame.sprite.Group()
 
+        self.snd_explosion.set_volume(0.5)
+
         # === LOAD BACKGROUND MUSIC ===
         pygame.mixer.music.load("src/assets/sounds/sound_theme.wav")
         pygame.mixer.music.set_volume(0.3)
