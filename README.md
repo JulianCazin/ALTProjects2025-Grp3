@@ -5,7 +5,7 @@
 
 # Start up
 
-Command to lunch the game : 
+Command to start the game : 
 ```
 python -m src.main
 ```
