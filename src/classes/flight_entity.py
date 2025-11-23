@@ -11,7 +11,7 @@ class FlightEntity(pg.sprite.Sprite):
         super().__init__()
         # Load bullet's sprite
         self.image = pg.image.load(image_path).convert_alpha()  # Transparency
-        self.image = pg.transform.scale(self.image, (50, 30))  # resize
+        self.image = pg.transform.scale(self.image, (40, 40))  # resize
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
