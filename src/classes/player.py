@@ -8,6 +8,7 @@ MAX_BONUS_INVENTORY = 3
 
 MAX_BONUS_INVENTORY = 3
 
+
 class Player(pg.sprite.Sprite):
 
     def __init__(self, x, y, image_path, speed):
@@ -17,6 +18,7 @@ class Player(pg.sprite.Sprite):
             Bonus.SPREAD_SHOT: self.shoot_spread,
             Bonus.SHIELD: self.shield,
         }
+        self.SHOOT_DELAY = 1
         # Load player's sprite
         self.image = pg.image.load(image_path).convert_alpha()
         self.image = pg.transform.scale(self.image, (100, 100))  # resize
@@ -33,6 +35,8 @@ class Player(pg.sprite.Sprite):
         self.almighty = False
         self.bonus = []
         self.bonus_group = pg.sprite.Group()
+        self.__start_shooting = None
+        self.__available_shoot = 3
 
     # movements and actions functions
     def update(self, screen_width):
@@ -46,12 +50,20 @@ class Player(pg.sprite.Sprite):
     # Basic shooting function
     def shoot_basic(self, bullet_group, bullet_class, bullet_img):
         """Create a bullet and add to the bullets group"""
-        bullet = bullet_class(self.rect.centerx, self.rect.top, bullet_img)
-        bullet_group.add(bullet)
-        self.effect.play_shoot()
+        if not self.__start_shooting:
+            self.__start_shooting = time.time()
+
+        if (time.time() - self.__start_shooting) >= self.SHOOT_DELAY:
+            self.__available_shoot = 3
+            self.__start_shooting = time.time()
+
+        if self.__available_shoot > 0:
+            bullet = bullet_class(self.rect.centerx, self.rect.top, bullet_img, vy=-20)
+            bullet_group.add(bullet)
+            self.effect.play_shoot()
+            self.__available_shoot -= 1
 
     # Spread shooting function
-
     def shoot_spread(self, *args, **kwargs):
         """
         Create three spreaded bullets :
