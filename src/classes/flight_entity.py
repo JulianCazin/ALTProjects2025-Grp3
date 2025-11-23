@@ -6,7 +6,7 @@ class FlightEntity(pg.sprite.Sprite):
 
     def __init__(self, x, y, image_path, vx=0, vy=-8):
         """Create a flight entity. A flight entity is an entity that falls down.
-        It has x and y coordonates, a sprite and x and y speed named vx and vy. 
+        It has x and y coordonates, a sprite and x and y speed named vx and vy.
         By default vx is equal to 0 and vy is equal to -8"""
         super().__init__()
         # Load bullet's sprite
@@ -45,7 +45,7 @@ class Bonus(FlightEntity):
     BONUS_LIST = [SPREAD_SHOT, SHIELD]
 
     def __init__(self, x, y, image_path, vx=0, vy=8):
-        """Create a bonus. It has x and y coordonates, a sprite 
+        """Create a bonus. It has x and y coordonates, a sprite
         and x and y speed named vx and vy. By default, vx is equal to 0
         and vy is equal to 8"""
         super().__init__(x, y, image_path, vx, vy)
@@ -152,7 +152,7 @@ class BonusDirector:
     def create_spread_shot_bonus(x, y):
         """Create a spread shot bonus at the coordonates"""
         return (
-            BonusBuilder(x, y, "src/assets/life.png")
+            BonusBuilder(x, y, "src/assets/triple_bonus.png")
             .with_type(Bonus.SPREAD_SHOT)
             .with_point(300)
             .with_durability(5)
@@ -165,7 +165,7 @@ class BonusDirector:
     def create_shield_bonus(x, y):
         """Create a shield bonus at the coordonates"""
         return (
-            BonusBuilder(x, y, "src/assets/explosion.png")
+            BonusBuilder(x, y, "src/assets/shield.png")
             .with_type(Bonus.SHIELD)
             .with_point(500)
             .with_durability(1)
