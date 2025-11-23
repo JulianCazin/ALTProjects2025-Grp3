@@ -5,6 +5,16 @@ import random
 class EffectsManager:
     def __init__(self):
         """Create an effect"""
+
+        # mixer non initialyzed (ex: in tests)
+        if not pygame.mixer.get_init():
+            self.snd_shoot = pygame.mixer.Sound("src/assets/sounds/shoot.wav")
+            self.snd_explosion = self.snd_hit = None
+            self.snd_gameover = self.snd_wave_clear = None
+            self.snd_boss_spawn = self.snd_boss_dead = None
+
+            return
+
         # load sounds
         self.snd_shoot = pygame.mixer.Sound("src/assets/sounds/shoot.wav")
         self.snd_explosion = pygame.mixer.Sound("src/assets/sounds/explosion.wav")

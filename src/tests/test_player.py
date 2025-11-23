@@ -72,7 +72,7 @@ def test_shoot_basic(player):
 
     # Fake bullet class
     class FakeBullet:
-        def __init__(self, x, y, img):
+        def __init__(self, x, y, img, vy):
             self.x = x
             self.y = y
 
